@@ -1,30 +1,36 @@
-// The module 'vscode' contains the VS Code extensibility API
-
-
 const createNewCommandPage = require("./screens/CreateNewCommandPage");
 const { createNewCommand, startTerminal, deleteActions, createBulkCommand, reStartTerminal, stopTerminal } = require("./functionality");
-
-
-const CheckBox = require("./screens/CheckBox");
+const HomePageUI = require("./screens/HomePageUI");
 const reStartView = require("./screens/Resolve");
-// Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+
 
 /**
- * this is store of all the taken imports
+ * keys of storess
  */
-const persisitKey = 'runProject.dev.akash';
+const KEY_COMMANDS = 'runProject.dev.akash_c';
+const KEY_STATE = 'runProject.dev.akash_s';
 
+/**
+ * project name
+ */
+const fancyProjectName = 'Run Project';
+
+
+/***
+ * Actual object store the datas
+ */
 let commandStore = [];
+let checkBoxState = {};
+let projectNames = {};
+let count = 0;
 const activeTerminals = {};
 const TERMINAL_IdMap = new Map();
-const projectIDKeep = new Map();
 
 
 
+//-------------------------------------------------🍟🚒💥--------------------------------------------------
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -33,8 +39,8 @@ function activate(context) {
 
   //accesing persistance store
   debugger
-  commandStore = context.globalState.get(persisitKey) || [];
-
+  commandStore = context.globalState.get(KEY_COMMANDS) || [];
+  checkBoxState = context.globalState.get(KEY_STATE) || {};
 
   function persistStore(key, data) {
     context.globalState.update(key, data);
@@ -71,7 +77,7 @@ function activate(context) {
     } else {
       panel = vscode.window.createWebviewPanel(
         'RunProject',
-        'Import Plus',
+        fancyProjectName,
         vscode.ViewColumn.One,
         {
           enableScripts: true
@@ -83,7 +89,7 @@ function activate(context) {
         panel = null;
       });
       // panel.webview.html = createNewCommandPage();
-      panel.webview.html = CheckBox(commandStore);
+      panel.webview.html = HomePageUI({ checkBoxState });
       // Handle messages from the webview
       panel.webview.onDidReceiveMessage(
         (message) => {
@@ -105,7 +111,7 @@ function activate(context) {
               vscode.window.showInformationMessage(message.data);
               break;
             case 'showList':
-              panel.webview.html = CheckBox(commandStore);
+              panel.webview.html = HomePageUI(commandStore);
               break;
             case 'openCreateAction':
               panel.webview.html = createNewCommandPage();
@@ -115,18 +121,18 @@ function activate(context) {
               if (errorOnStart.length) {
                 panel.webview.html = reStartView(errorOnStart);
               } else {
-                panel.webview.html = CheckBox(commandStore);
+                panel.webview.html = HomePageUI(commandStore);
               }
               persistStore('persistedCommand', commandStore);
               break;
             case 'restartTerminal':
               reStartTerminal(vscode, message, commandStore, activeTerminals, TERMINAL_IdMap);
-              panel.webview.html = CheckBox(commandStore);
+              panel.webview.html = HomePageUI(commandStore);
               break;
             case 'deleteActions':
               deleteActions(vscode, message, commandStore, () => {
                 persistStore('persistedCommand', commandStore);
-                panel.webview.html = CheckBox(commandStore);
+                panel.webview.html = HomePageUI(commandStore);
               }, activeTerminals, TERMINAL_IdMap);
               break;
             case 'stopActions':
@@ -148,8 +154,8 @@ function activate(context) {
   // Create a status bar item with an icon
   const statusBarIcon = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
   statusBarIcon.command = 'Run.ProjectUI';
-  statusBarIcon.text = `$(zap) Run Project`;  // $(zap) is an icon from the Octicons set
-  statusBarIcon.tooltip = 'Open Run Project';
+  statusBarIcon.text = `$(zap) ${fancyProjectName}`;  // $(zap) is an icon from the Octicons set
+  statusBarIcon.tooltip = `Open ${fancyProjectName}`;
   statusBarIcon.show();
 
 
