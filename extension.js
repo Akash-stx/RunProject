@@ -11,7 +11,8 @@ const vscode = require("vscode");
  */
 const KEY_COMMANDS = 'runProject.dev.akash_c';
 const KEY_STATE = 'runProject.dev.akash_s';
-
+const KEY_PROJECTS = 'runProject.dev.akash_p';
+const KEY_NUMBER = 'runProject.dev.akash_n';
 /**
  * project name
  */
@@ -27,7 +28,29 @@ let projectNames = {};
 let count = 0;
 const activeTerminals = {};
 const TERMINAL_IdMap = new Map();
+const catchUI = {};
 
+
+
+function init(context) {
+  commandStore = context.globalState.get(KEY_COMMANDS) || [];
+  checkBoxState = context.globalState.get(KEY_STATE) || {};
+  projectNames = context.globalState.get(KEY_PROJECTS) || {};
+  count = context.globalState.get(KEY_NUMBER) || 0;
+}
+
+function loadOrRenderCacheUI(cacheKey, uiFunction, panel) {
+  let cache = catchUI[cacheKey];
+  if (!cache) {
+    cache = uiFunction?.();
+    catchUI[cacheKey] = cache;
+  }
+  panel.webview.html = cache;
+}
+
+function setCachedUI(cacheKey, cachedUI) {
+  catchUI[cacheKey] = cachedUI;
+}
 
 
 //-------------------------------------------------🍟🚒💥--------------------------------------------------
@@ -36,15 +59,16 @@ const TERMINAL_IdMap = new Map();
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+  /**
+   * initializations
+   */init(context);
 
-  //accesing persistance store
-  debugger
-  commandStore = context.globalState.get(KEY_COMMANDS) || [];
-  checkBoxState = context.globalState.get(KEY_STATE) || {};
 
   function persistStore(key, data) {
     context.globalState.update(key, data);
   }
+
+
 
 
   //#EVENTS
@@ -53,7 +77,7 @@ function activate(context) {
 
   // Handle terminal close event
   vscode.window.onDidCloseTerminal(Terminal => {
-    const { terminal, name } = TERMINAL_IdMap.get(Terminal);// getting by refrrnece way no other way is easy // other way is hard , or i  dnont have time for it
+    const { terminal, name } = TERMINAL_IdMap.get(Terminal);
     if (terminal && name) {
       TERMINAL_IdMap.delete(Terminal);
       delete activeTerminals[name];
@@ -67,13 +91,15 @@ function activate(context) {
   const Screen = vscode.commands.registerCommand('Run.ProjectUI', () => {
     // Check if the webview panel is already open
     if (panel) {
-      //1) way one
-      // If it is, reveal it (bring it to front)
-      //panel.reveal(vscode.ViewColumn.One); 
-
-      //2) way two
-      panel.dispose();
-      panel = null; // Reset the panel variable so it can be recreated next time
+      setCachedUI("home", panel.webview.html);
+      if (panel.visible) {
+        // ✅ If panel is currently visible, dispose (close) it
+        panel.dispose();
+        panel = null; // Reset the panel variable
+      } else {
+        // ✅ If panel exists but is not visible, bring it to front
+        panel.reveal(vscode.ViewColumn.One);
+      }
     } else {
       panel = vscode.window.createWebviewPanel(
         'RunProject',
@@ -88,8 +114,10 @@ function activate(context) {
       panel.onDidDispose(() => {
         panel = null;
       });
-      // panel.webview.html = createNewCommandPage();
-      panel.webview.html = HomePageUI({ checkBoxState });
+
+      //setting initial UI home page
+      loadOrRenderCacheUI("home", () => HomePageUI({ checkBoxState, fancyProjectName }), panel);
+
       // Handle messages from the webview
       panel.webview.onDidReceiveMessage(
         (message) => {

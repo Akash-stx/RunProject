@@ -1,20 +1,22 @@
-function HomePageUI({ checkBoxState } = {}) {
-    const actions = [
-        {
-            id: 200,
-            name: "Ctool Project", datas: [
-                { id: "90", commandDescription: "some thing", actualCommand: "npm start", check: true },
-                { id: "91", commandDescription: "build project", actualCommand: "npm run build", check: true }
-            ]
-        },
-        {
-            id: 300,
-            name: "Another Project", datas: [
-                { id: "23", commandDescription: "run tests", actualCommand: "npm test", check: false },
-                { id: "231", commandDescription: "deploy project", actualCommand: "npm run deploy", check: false }
-            ]
-        }
-    ] || [];
+function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
+    // const actions = [
+    //     {
+    //         id: 200,
+    //         name: "Ctool Project", datas: [
+    //             { id: "90", commandDescription: "some thing", actualCommand: "npm start", check: true },
+    //             { id: "91", commandDescription: "build project", actualCommand: "npm run build", check: true }
+    //         ]
+    //     },
+    //     {
+    //         id: 300,
+    //         name: "Another Project", datas: [
+    //             { id: "23", commandDescription: "run tests", actualCommand: "npm test", check: false },
+    //             { id: "231", commandDescription: "deploy project", actualCommand: "npm run deploy", check: false }
+    //         ]
+    //     }
+    // ] || [];
+
+    const actions = [];
 
     const toExport = JSON.stringify(actions);
 
@@ -107,6 +109,9 @@ function HomePageUI({ checkBoxState } = {}) {
             .commands {
                 margin-left: 20px;
             }
+            h1{
+                font-family: cursive;
+            }
             label {
                 display: flex;
                 align-items: center;
@@ -161,7 +166,7 @@ function HomePageUI({ checkBoxState } = {}) {
         </style>
     </head>
     <body>
-        <h1>Run Project</h1>
+        <h1>${fancyProjectName}</h1>
         <textarea id="exportData">${toExport}</textarea>
          
         <div id="actionsContainer">${checkboxesHtml}</div>
