@@ -194,7 +194,7 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
 
                   if (checkedItems?.length) {
                     vscode.postMessage({
-                        command: 'createTerminal',
+                        callMethod: 'createTerminal',
                         data: result
                     });
                 }
@@ -244,7 +244,7 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
 
                  
                  vscode.postMessage({
-                            command: 'alert',
+                            callMethod: 'alert',
                             data: "Data copied to clipboard!"
                         });
             });
@@ -257,7 +257,7 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
 
                 if (checkedItems?.length) {
                     vscode.postMessage({
-                        command: 'deleteActions',
+                        callMethod: 'deleteActions',
                         data: checkedItems
                     });
                 }
@@ -270,7 +270,7 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
 
                 if (checkedItems?.length) {
                     vscode.postMessage({
-                        command: 'stopActions',
+                        callMethod: 'stopActions',
                         data: checkedItems
                     });
                 }
@@ -283,7 +283,7 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
 
                 if (checkedItems?.length) {
                     vscode.postMessage({
-                        command: 'restartTerminal',
+                        callMethod: 'restartTerminal',
                         data: checkedItems
                     });
                 }
@@ -293,7 +293,7 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
 
             document.getElementById('createNewAction').addEventListener('click', function() {
                 vscode.postMessage({
-                    command: 'openCreateAction',
+                    callMethod: 'addNewCommandUI',
                     data: null
                 });
             });

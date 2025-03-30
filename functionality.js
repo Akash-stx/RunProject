@@ -1,12 +1,26 @@
 
-function createNewCommand(commandStore, message, vscode) {
+function createNewCommand(response, common) {
+    const { name, command, projectName } = response?.data || {};
+    const project = common.projectNames();
+
+    if (project?.[projectName]) {
+        console.log("present this project")
+        return false;
+    } else {
+        const indexNumber = common.count();
+        project[projectName] = {
+            project: `'${projectName}'`,
+            index: indexNumber
+        }
+        return true;
+    }
 
     // const uuid = uuidv4();
-    if (message?.data?.name && message.data.command && !(message?.data?.name in commandStore)) {
-        commandStore[message.data.name] = {
-            id: message.data.name,
-            name: message.data.name,
-            command: message.data.command,
+    if (response?.data?.name && response.data.command && !(response?.data?.name in commandStore)) {
+        commandStore[response.data.name] = {
+            id: response.data.name,
+            name: response.data.name,
+            command: response.data.command,
             checked: false,
         }
         vscode.window.showInformationMessage('New Action command is created');

@@ -107,7 +107,7 @@ function Resolve(data) {
 
             viewActionListButton.addEventListener('click', () => {
                 vscode.postMessage({
-                    command: 'showList',
+                    callMethod: 'homePage',
                     data: null
                 });
             });
@@ -123,7 +123,7 @@ function Resolve(data) {
 
                   if (result?.length) {
                     vscode.postMessage({
-                        command: 'restartTerminal',
+                        callMethod: 'restartTerminal',
                         data: result
                     });
                 }

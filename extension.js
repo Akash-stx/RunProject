@@ -1,4 +1,4 @@
-const createNewCommandPage = require("./screens/CreateNewCommandPage");
+const addNewCommandUIpage = require("./screens/addNewCommandUIpage");
 const { createNewCommand, startTerminal, deleteActions, createBulkCommand, reStartTerminal, stopTerminal } = require("./functionality");
 const HomePageUI = require("./screens/HomePageUI");
 const reStartView = require("./screens/Resolve");
@@ -28,7 +28,7 @@ let projectNames = {};
 let count = 0;
 const activeTerminals = {};
 const TERMINAL_IdMap = new Map();
-const catchUI = {};
+const cacheUI = {};
 
 
 
@@ -40,16 +40,16 @@ function init(context) {
 }
 
 function loadOrRenderCacheUI(cacheKey, uiFunction, panel) {
-  let cache = catchUI[cacheKey];
+  let cache = cacheUI[cacheKey];
   if (!cache) {
     cache = uiFunction?.();
-    catchUI[cacheKey] = cache;
+    cacheUI[cacheKey] = cache;
   }
   panel.webview.html = cache;
 }
 
 function setCachedUI(cacheKey, cachedUI) {
-  catchUI[cacheKey] = cachedUI;
+  cacheUI[cacheKey] = cachedUI;
 }
 
 
@@ -88,10 +88,24 @@ function activate(context) {
 
   let panel;
 
+  const common = {
+    checkBoxState: () => checkBoxState,
+    fancyProjectName,
+    projectNames: () => projectNames,
+    panel: () => panel,
+    vscode,
+    cacheUI: () => cacheUI,
+    TERMINAL_IdMap: () => TERMINAL_IdMap,
+    activeTerminals: () => activeTerminals,
+    count: () => count++,
+    commandStore: () => commandStore,
+  };
+
+
   const Screen = vscode.commands.registerCommand('Run.ProjectUI', () => {
     // Check if the webview panel is already open
     if (panel) {
-      setCachedUI("home", panel.webview.html);
+      setCachedUI("home", panel?.webview?.html || undefined);
       if (panel.visible) {
         // ✅ If panel is currently visible, dispose (close) it
         panel.dispose();
@@ -115,37 +129,44 @@ function activate(context) {
         panel = null;
       });
 
+
+
       //setting initial UI home page
-      loadOrRenderCacheUI("home", () => HomePageUI({ checkBoxState, fancyProjectName }), panel);
+      loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
 
       // Handle messages from the webview
       panel.webview.onDidReceiveMessage(
-        (message) => {
+        (response) => {
 
-          switch (message.command) {
+          switch (response.callMethod) {
+            //===========> UI first
+            case 'homePage':
+              loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
+              break;
+            case 'addNewCommandUI':
+              loadOrRenderCacheUI("addNewCommand", () => addNewCommandUIpage(common), panel);
+              break;
+
+
+            //===========> service next 
             case 'createCommand':
-              const result = createNewCommand(commandStore, message, vscode);
+              const result = createNewCommand(response, common);
               if (result) {
-                persistStore('persistedCommand', commandStore);
+                //persistStore('persistedCommand', commandStore);
+                setCachedUI("addNewCommand", addNewCommandUIpage(common));
               }
               break;
             case 'createBulkCommands':
-              const BulkedResult = createBulkCommand(commandStore, message, vscode);
+              const BulkedResult = createBulkCommand(commandStore, response, vscode);
               if (BulkedResult) {
                 persistStore('persistedCommand', commandStore);
               }
               break;
             case "alert":
-              vscode.window.showInformationMessage(message.data);
-              break;
-            case 'showList':
-              panel.webview.html = HomePageUI(commandStore);
-              break;
-            case 'openCreateAction':
-              panel.webview.html = createNewCommandPage();
+              vscode.window.showInformationMessage(response.data);
               break;
             case 'createTerminal':
-              const errorOnStart = startTerminal(vscode, message, commandStore, activeTerminals, TERMINAL_IdMap);
+              const errorOnStart = startTerminal(vscode, response, commandStore, activeTerminals, TERMINAL_IdMap);
               if (errorOnStart.length) {
                 panel.webview.html = reStartView(errorOnStart);
               } else {
@@ -154,17 +175,17 @@ function activate(context) {
               persistStore('persistedCommand', commandStore);
               break;
             case 'restartTerminal':
-              reStartTerminal(vscode, message, commandStore, activeTerminals, TERMINAL_IdMap);
+              reStartTerminal(vscode, response, commandStore, activeTerminals, TERMINAL_IdMap);
               panel.webview.html = HomePageUI(commandStore);
               break;
             case 'deleteActions':
-              deleteActions(vscode, message, commandStore, () => {
+              deleteActions(vscode, response, commandStore, () => {
                 persistStore('persistedCommand', commandStore);
                 panel.webview.html = HomePageUI(commandStore);
               }, activeTerminals, TERMINAL_IdMap);
               break;
             case 'stopActions':
-              stopTerminal(vscode, message, commandStore, activeTerminals, TERMINAL_IdMap);
+              stopTerminal(vscode, response, commandStore, activeTerminals, TERMINAL_IdMap);
               break;
           }
         },

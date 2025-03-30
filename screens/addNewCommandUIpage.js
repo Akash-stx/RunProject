@@ -1,5 +1,5 @@
-function createNewCommandPage({ projectName } = {}) {
-
+function addNewCommandUIpage({ projectNames } = {}) {
+    const projects = Object.values((projectNames()))?.map((data) => data?.project)?.join();
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -84,10 +84,11 @@ function createNewCommandPage({ projectName } = {}) {
         <div class="container">
             <h1>Create New Action : for Command Prompt</h1>
             <label><input type="checkbox" id="bulkToggle"> Enable Bulk Entry</label>
-            <input type="text" id="searchBox" placeholder="Type something..." >
+            <label for="searchBox">Project Name:</label>
+            <input type="text" id="searchBox" placeholder="Enter the Project Name" required>
             <ul id="suggestionsBox" ></ul>
-            <label for="name">Name:</label>
-            <input type="text" id="name" placeholder="Enter the name" required>
+            <label for="name">Command Title:</label>
+            <input type="text" id="name" placeholder="Enter the Command Title" required>
             
             <label for="command">Command:</label>
             <input type="text" id="command" placeholder="Enter the command" required>
@@ -124,13 +125,13 @@ function createNewCommandPage({ projectName } = {}) {
 
             viewActionListButton.addEventListener('click', () => {
                 vscode.postMessage({
-                    command: 'showList',
+                    callMethod: 'homePage',
                     data: null
                 });
             });
 
 
-            const suggestions = ["Apple", "Banana", "Cherry", "Date", "Grapes", "Mango"];
+            const suggestions = [${projects}];
 
             
             function hideSuggestion(){
@@ -144,7 +145,7 @@ function createNewCommandPage({ projectName } = {}) {
             
 
             function ShowSuggestion(){
-                      suggestionBox.style.opacity = "1";
+                     suggestionBox.style.opacity = "1";
                      suggestionBox.style.pointerEvents = "auto"; // Allow interactions
 
             }
@@ -190,27 +191,28 @@ function createNewCommandPage({ projectName } = {}) {
                     try {
                         const bulkActions = JSON.parse(bulkJson);
                         vscode.postMessage({
-                            command: 'createBulkCommands',
+                            callMethod: 'createBulkCommands',
                             data: bulkActions
                         });
                     } catch (error) {
                         vscode.postMessage({
-                            command: 'alert',
+                            callMethod: 'alert',
                             data: "Invalid JSON format. Please check your input."
                         });
                     }
                 } else {
                     // Handle single entry input
+                    const projectName =input.value.trim();
                     const name = nameField.value.trim();
                     const command = commandField.value.trim();
-                    if (command && name) {
+                    if (command && name && projectName) {
                         vscode.postMessage({
-                            command: 'createCommand',
-                            data: { name, command }
+                            callMethod: 'createCommand',
+                            data: { name, command , projectName}
                         });
                     } else {
                         vscode.postMessage({
-                            command: 'alert',
+                            callMethod: 'alert',
                             data: "Please fill all fields."
                         });
                     }
@@ -244,4 +246,4 @@ function createNewCommandPage({ projectName } = {}) {
     </html>`;
 }
 
-module.exports = createNewCommandPage;
+module.exports = addNewCommandUIpage;
