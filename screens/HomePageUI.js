@@ -1,4 +1,4 @@
-function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProjectLocator } = {}) {
+function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProjectLocator, getIsStartupSelected } = {}) {
 
 
     const actions = commandStore(); //load all data like project name and its comment like that
@@ -58,7 +58,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             </div>
         </div>`
         }).join('')
-        : "<p id='noActionPresent'>No actions available. Click 'Add' to create one!</p>";
+        : "<p id='noActionPresent'>Looks empty! Click 'Add' to create one.</p>";
 
 
     UICreator.checkBoxData.push("}");
@@ -163,6 +163,69 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 margin: 0 5px;
                 transition: background-color 0.3s, transform 0.2s;
             }
+
+              .switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
+            }
+
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: .4s;
+                border-radius: 24px;
+            }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            input:checked + .slider {
+                background-color: #4CAF50;
+            }
+
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+
+
+            .tooltip-container {
+                padding-left: 10px;
+                border: #fafaf8;
+                border-width: medium;
+                border-style: solid;
+            }
+
+            .tooltip {
+                position: relative;
+                top: 5px;
+                font-weight: 600;
+                color: black;
+                margin-right: 10px;
+            }
+
+
             #exportData {
             position: absolute; /* Position it off-screen */
             left: -9999px; /* Move it off the visible area */
@@ -170,6 +233,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             height: 1px; /* Minimal height */
             opacity: 0; /* Fully transparent */
             }
+
             #runButton { background-color: #28a745; }
             #runButton:hover { background-color: #218838; transform: translateY(-1px); }
             #restartButton { background-color: #dc3545; }
@@ -186,6 +250,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
     </head>
     <body>
         <h1 id="nameOfProject">${fancyProjectName}</h1>
+
         <textarea id="exportData">${toExport}</textarea>
          
         <div id="actionsContainer">${checkboxesHtml}</div>
@@ -194,35 +259,45 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             <button id="restartButton">Restart Selected</button>
             <button id="stopButton">Stop Selected</button>
             <button id="deleteButton">Delete Selected</button>
-            <button id="exportButton">Copy All Selected as JSON</button>
+            <button id="exportButton">Copy as JSON</button>
             <button id="createNewAction">Add</button>
+            
+           <div class="tooltip-container">
+            <label class="switch">
+                <input type="checkbox" id="startupToggle"  ${getIsStartupSelected() ? "checked" : ""}>
+                <span class="slider"></span>
+            </label>
+            <span class="tooltip">Enable Auto-Start</span>
+            </div>
+            
+            
         </div>
 
         <script>
             const vscode = acquireVsCodeApi();
             const stateOfCheckBOx=${UICreator.checkBoxData.join("")};
+
+            const toggle = document.getElementById("startupToggle");
+
+            toggle.addEventListener("change", function() {
+                vscode.postMessage({
+                        callMethod: 'allowStartup',
+                        data: this.checked
+                    });
+            });
             
-            // Handle button clicks
+            
             document.getElementById('runButton').addEventListener('click', function() {
-                // const result={};
-                // const checkedItems = Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked'));
 
-                //   checkedItems.forEach(input => {
-                //    result[input.id]=input.id;
-                //    });
-
-                //   if (checkedItems?.length) {
                     vscode.postMessage({
                         callMethod: 'createTerminal',
                         data: stateOfCheckBOx
                     });
-                // }
                 
             });
 
 
             document.getElementById("actionsContainer").addEventListener("change", function(event) {
-            debugger;
             
                 const target = event.target;
                 if (target.classList.contains("project-checkbox")) {

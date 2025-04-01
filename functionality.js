@@ -228,5 +228,5 @@ module.exports = {
     createNewCommand,
     startTerminal,
     deleteActions, createBulkCommand,
-    reStartTerminal, stopTerminal
+    reStartTerminal, stopTerminal, createNewTerminal
 }

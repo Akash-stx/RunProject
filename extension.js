@@ -1,5 +1,5 @@
 const addNewCommandUIpage = require("./screens/addNewCommandUIpage");
-const { createNewCommand, startTerminal, deleteActions, createBulkCommand, reStartTerminal, stopTerminal } = require("./functionality");
+const { createNewCommand, createNewTerminal, startTerminal, deleteActions, createBulkCommand, reStartTerminal, stopTerminal } = require("./functionality");
 const HomePageUI = require("./screens/HomePageUI");
 const reStartView = require("./screens/Resolve");
 const vscode = require("vscode");
@@ -14,6 +14,7 @@ const KEY_COMMANDS = 'LaunchBoard.dev.akash_c';
 const KEY_STATE = 'LaunchBoard.dev.akash_s';
 const KEY_PROJECTS = 'LaunchBoard.dev.akash_p';
 const KEY_NUMBER = 'LaunchBoard.dev.akash_n';
+const KEY_STARTUP = 'LaunchBoard.dev.akash_t';
 
 let iconcache = undefined;
 
@@ -36,6 +37,9 @@ function getIcon(context) {
 /***
  * Actual object store the datas
  */
+let CurrentContextVscode;
+
+let isStartup = false;
 let commandStore = {};
 let checkBoxState = {};
 let eachProjectLocator = [];
@@ -54,6 +58,15 @@ function init(context) {
   checkBoxState = context.globalState.get(KEY_STATE) || {};
   eachProjectLocator = context.globalState.get(KEY_PROJECTS) || [];
   count = context.globalState.get(KEY_NUMBER) || 0;
+  isStartup = context.globalState.get(KEY_STARTUP) || false;
+}
+
+function backup() {
+  CurrentContextVscode.globalState.update(KEY_COMMANDS, commandStore);
+  CurrentContextVscode.globalState.update(KEY_STATE, checkBoxState);
+  CurrentContextVscode.globalState.update(KEY_PROJECTS, eachProjectLocator);
+  CurrentContextVscode.globalState.update(KEY_NUMBER, count);
+  CurrentContextVscode.globalState.update(KEY_STARTUP, isStartup);
 }
 
 function loadOrRenderCacheUI(cacheKey, uiFunction, panel) {
@@ -84,9 +97,10 @@ function setCachedUI(cacheKey, cachedUI) {
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+  CurrentContextVscode = context;
   /**
    * initializations
-   */init(context);
+   */ init(context);
 
 
   function persistStore(key, data) {
@@ -114,6 +128,7 @@ function activate(context) {
   let panel;
 
   const common = {
+    getIsStartupSelected: () => isStartup,
     checkBoxState: () => checkBoxState,
     setCheckBoxState: (newState = {}) => {
       checkBoxState = newState;
@@ -130,10 +145,12 @@ function activate(context) {
   };
 
 
+
+
   const Screen = vscode.commands.registerCommand('LaunchBoard', () => {
     // Check if the webview panel is already open
     if (panel) {
-      setCachedUI("home", panel?.webview?.html || undefined);
+      //setCachedUI("home", panel?.webview?.html || undefined);
       if (panel.visible) {
         // If panel is currently visible, dispose (close) it
         panel.dispose();
@@ -181,6 +198,7 @@ function activate(context) {
             case 'createCommand':
               const result = createNewCommand(response, common);
               if (result) {
+                backup();
                 //persistStore('persistedCommand', commandStore);
                 reloadUI = 2; // logic wich allow two diffrent screen to alow new render not take cache
               }
@@ -216,6 +234,11 @@ function activate(context) {
             case 'stopActions':
               stopTerminal(vscode, response, commandStore, activeTerminals, TERMINAL_IdMap);
               break;
+            case 'allowStartup':
+              isStartup = response.data || false;
+              vscode.window.showInformationMessage("Status Changed");
+              break;
+
           }
         },
         undefined,
@@ -240,10 +263,15 @@ function activate(context) {
 
   context.subscriptions.push(Screen);
   context.subscriptions.push(statusBarIcon);
+
+  if (isStartup) {
+    createNewTerminal({ id: 33, commandDescription: 'ddd', actualCommand: "dddawdq" }, common);
+  }
 }
 
 // This method is called when your extension is deactivated
-function deactivate() { }
+function deactivate() {
+}
 
 module.exports = {
   activate,
