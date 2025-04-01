@@ -92,11 +92,11 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 font-size: 16px;
                 font-weight: bold;
                 text-align: center;
-                color: #ff4d4d; /* A soft red color for emphasis */
-                background: #ffecec; /* Light red background */
+                color: #e24a60;
+                background: #f6f6f5;
                 padding: 10px;
                 border-radius: 6px;
-                border: 1px solid #ff9999;
+                border: 1px solid #4a90e2;
                 margin: 10px 0;
             }
             .project {

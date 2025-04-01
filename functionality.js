@@ -9,7 +9,7 @@ function createNewCommand(response, common) {
     if (currentProjectFromArray) { // already this project is present 
         const project = mainCommandObject[currentProjectFromArray.projectId];
         const commandID = common.count();
-        project.datas[commandID] = { id: commandID, commandDescription: name, actualCommand: command };
+        project.datas[commandID] = { id: commandID, projectId: commandID.projectId, commandDescription: name, actualCommand: command };
 
     } else {
         const projectId = common.count();
@@ -26,7 +26,7 @@ function createNewCommand(response, common) {
             projectName: projectName,
             projectLocatIndex: savedIndex - 1,
             datas: {
-                [commandID]: { id: commandID, commandDescription: name, actualCommand: command }
+                [commandID]: { id: commandID, projectId, commandDescription: name, actualCommand: command }
             },
         };
 
@@ -137,15 +137,15 @@ function startTerminal(response, common) {
 
             });
 
-            if (actions[singleActionObject.id]) {
-                singleActionObject.checked = true;
-                const result = createNewTerminal(vscode, singleActionObject, activeTerminals, TERMINAL_IdMap);
-                if (result) {
-                    commandThatCannotAbleToStart.push(singleActionObject);//name
-                }
-            } else {
-                singleActionObject.checked = false;
-            }
+            // if (actions[singleActionObject.id]) {
+            //     singleActionObject.checked = true;
+            //     const result = createNewTerminal(vscode, singleActionObject, activeTerminals, TERMINAL_IdMap);
+            //     if (result) {
+            //         commandThatCannotAbleToStart.push(singleActionObject);//name
+            //     }
+            // } else {
+            //     singleActionObject.checked = false;
+            // }
         }
     );
 
