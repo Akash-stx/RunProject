@@ -19,7 +19,7 @@ A VS Code extension that enhances coding efficiency by providing contextual code
 
 1. Open _Visual Studio Code_.
 2. Go to the _Extensions_ view by clicking on the Extensions icon in the Activity Bar or pressing `Ctrl + Shift + X`.
-3. Search for "**RunProject**" and click _Install_.
+3. Search for "**LaunchBoard**" and click _Install_.
 
 ## Usage
 

@@ -1,22 +1,9 @@
-function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
-    // const actions = [
-    //     {
-    //         id: 200,
-    //         name: "Ctool Project", datas: [
-    //             { id: "90", commandDescription: "some thing", actualCommand: "npm start", check: true },
-    //             { id: "91", commandDescription: "build project", actualCommand: "npm run build", check: true }
-    //         ]
-    //     },
-    //     {
-    //         id: 300,
-    //         name: "Another Project", datas: [
-    //             { id: "23", commandDescription: "run tests", actualCommand: "npm test", check: false },
-    //             { id: "231", commandDescription: "deploy project", actualCommand: "npm run deploy", check: false }
-    //         ]
-    //     }
-    // ] || [];
+function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProjectLocator } = {}) {
 
-    const actions = [];
+
+    const actions = commandStore(); //load all data like project name and its comment like that
+    const checkedState = checkBoxState(); // load the data like wich is checkbox seleected wich is not
+    const projectLocater = eachProjectLocator();
 
     const toExport = JSON.stringify(actions);
 
@@ -27,36 +14,43 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
 
     UICreator.checkBoxData.push("{");
 
-    const checkboxesHtml = actions?.length
-        ? actions.map((project) => {
-            const checkboxSize = project.datas.length;
-            if (!checkboxSize) {
+    const checkboxesHtml = projectLocater?.length
+        ? projectLocater.map((locaterData) => {
+            const project = actions[locaterData.projectId];
+            const checkbox = Object.values(project?.datas || {});
+            if (!project && !checkbox.length) {
                 return "";
             }
 
-            UICreator.checkBoxData.push(project.id);
+
+            const state = checkedState[project.projectId];
+
+            UICreator.checkBoxData.push(project.projectId);
             UICreator.checkBoxData.push(":");
 
+            const checkboxSize = checkbox.length;
             let howmanychecked = 0;
             let collectSelectedCheckBoxId = [];
-            const innerCheckBox = project.datas.map((command) => {
-                if (command.check) {
-                    collectSelectedCheckBoxId.push(`${command.id}:${command.id}`);
+
+            const innerCheckBox = checkbox.map((command) => {
+                const isChecked = state?.checkedCheckBoxId[command.id];
+                if (isChecked) {
+                    collectSelectedCheckBoxId.push(`${command.id}:true`);
                     howmanychecked++;
                 }
 
                 return `<label class="command-item" style="display: block; margin-top: 5px;">
-                    <input type="checkbox" class="command-checkbox" data-project="${project.id}" id="${command.id}" ${command.check ? "checked" : ""}>
+                    <input type="checkbox" class="command-checkbox" data-project="${project.projectId}" data-id="${command.id}" id="${command.id}" ${isChecked ? "checked" : ""}>
                     ${command.commandDescription} (${command.actualCommand})
                 </label>`
             }).join('');
 
-            UICreator.checkBoxData.push(`{project:${project.id} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
+            UICreator.checkBoxData.push(`{project:${project.projectId} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
             return `<div class="project" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
             <div class="project-header" style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">
                 <label>
-                  <input type="checkbox" id="${project.id}" class="project-checkbox" data-project="${project.id}" ${checkboxSize === howmanychecked ? "checked" : ""}>
-                  ${project.name}
+                  <input type="checkbox" id="${project.projectId}" class="project-checkbox" data-project="${project.projectId}" ${checkboxSize === howmanychecked ? "checked" : ""}>
+                  ${project.projectName}
                 </label>
             </div>
             <div class="commands" style="margin-left: 20px;">
@@ -185,32 +179,36 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
             
             // Handle button clicks
             document.getElementById('runButton').addEventListener('click', function() {
-                const result={};
-                const checkedItems = Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked'));
+                // const result={};
+                // const checkedItems = Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked'));
 
-                  checkedItems.forEach(input => {
-                   result[input.id]=input.id;
-                   });
+                //   checkedItems.forEach(input => {
+                //    result[input.id]=input.id;
+                //    });
 
-                  if (checkedItems?.length) {
+                //   if (checkedItems?.length) {
                     vscode.postMessage({
                         callMethod: 'createTerminal',
-                        data: result
+                        data: stateOfCheckBOx
                     });
-                }
+                // }
                 
             });
 
 
             document.getElementById("actionsContainer").addEventListener("change", function(event) {
             debugger;
+            
                 const target = event.target;
                 if (target.classList.contains("project-checkbox")) {
                     const projectName = target.dataset.project;
                     const isChecked = target.checked;
                     document.querySelectorAll(".command-checkbox[data-project='" + projectName + "']").forEach(cmdCheckbox => {
+                        const checkBoxId = cmdCheckbox.dataset.id;
+                        stateOfCheckBOx[projectName].checkedCheckBoxId[checkBoxId] = isChecked;
                         cmdCheckbox.checked = isChecked;
                     });
+
                     if(isChecked){
                       stateOfCheckBOx[projectName].current = stateOfCheckBOx[projectName].total;
                     }else{
@@ -219,8 +217,10 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
 
                 }else if(target.classList.contains("command-checkbox")){
                      const projectName = target.dataset.project;
+                     const checkBoxId = target.dataset.id;
                      const element  = document.getElementById(projectName);
                      const isChecked = target.checked;
+                     stateOfCheckBOx[projectName].checkedCheckBoxId[checkBoxId] = isChecked;
                      if(isChecked){
                         stateOfCheckBOx[projectName].current++;
                         if(stateOfCheckBOx[projectName].current ===  stateOfCheckBOx[projectName].total){
@@ -235,6 +235,7 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
                      }
                      
                 }
+                      console.log(stateOfCheckBOx);
             });
 
             document.getElementById('exportButton').addEventListener('click', () => {
@@ -252,15 +253,13 @@ function HomePageUI({ checkBoxState, fancyProjectName } = {}) {
 
 
             document.getElementById('deleteButton').addEventListener('click', function() {
-                const checkedItems = Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked'))
-                    .map(input => input.id);
+                // const checkedItems = Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked'))
 
-                if (checkedItems?.length) {
                     vscode.postMessage({
                         callMethod: 'deleteActions',
-                        data: checkedItems
+                        data: stateOfCheckBOx
                     });
-                }
+                
             });
 
 

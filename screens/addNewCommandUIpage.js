@@ -1,5 +1,5 @@
-function addNewCommandUIpage({ projectNames } = {}) {
-    const projects = Object.values((projectNames()))?.map((data) => data?.project)?.join();
+function addNewCommandUIpage({ eachProjectLocator } = {}) {
+    const projects = eachProjectLocator().map((data) => data?.searchBox)?.join();
     return `
     <!DOCTYPE html>
     <html lang="en">

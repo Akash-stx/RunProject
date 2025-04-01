@@ -1,6 +1,6 @@
 {
-  "name": "RunProject",
-  "displayName": "Run Project",
+  "name": "launchboard",
+  "displayName": "LaunchBoard",
   "publisher": "dev-akash",
   "description": "",
   "icon": "icon.png",
@@ -18,17 +18,13 @@
   "contributes": {
     "commands": [
       {
-        "command": "Run.Project",
-        "title": "RunProject"
-      },
-      {
-        "command": "extension.showWebview",
-        "title": "Show Webview"
+        "command": "LaunchBoard",
+        "title": "LaunchBoard"
       }
     ],
     "keybindings": [
       {
-        "command": "Run.Project",
+        "command": "LaunchBoard",
         "key": "ctrl+shift+l",
         "when": "editorTextFocus"
       }

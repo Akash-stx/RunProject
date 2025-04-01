@@ -1,20 +1,39 @@
 
 function createNewCommand(response, common) {
     const { name, command, projectName } = response?.data || {};
-    const project = common.projectNames();
+    const eachProjectLocator = common.eachProjectLocator();//load all project name and its saved index on commandStore
+    const mainCommandObject = common.commandStore();
 
-    if (project?.[projectName]) {
-        console.log("present this project")
-        return false;
+    const currentProjectFromArray = eachProjectLocator.find((project) => project.projectName === projectName);
+
+    if (currentProjectFromArray) { // already this project is present 
+        const project = mainCommandObject[currentProjectFromArray.projectId];
+        const commandID = common.count();
+        project.datas[commandID] = { id: commandID, commandDescription: name, actualCommand: command };
+
     } else {
-        const indexNumber = common.count();
-        project[projectName] = {
-            project: `'${projectName}'`,
-            index: indexNumber
-        }
-        return true;
-    }
+        const projectId = common.count();
+        const savedIndex = eachProjectLocator.push({
+            projectId: projectId,
+            projectName: projectName,
+            projectNameSmallCase: projectName.toLowerCase(),
+            searchBox: `'${projectName}'`
+        });
 
+        const commandID = common.count();
+        mainCommandObject[projectId] = {
+            projectId: projectId,
+            projectName: projectName,
+            projectLocatIndex: savedIndex - 1,
+            datas: {
+                [commandID]: { id: commandID, commandDescription: name, actualCommand: command }
+            },
+        };
+
+
+    }
+    common.vscode.window.showInformationMessage('New command is created');
+    return true;
     // const uuid = uuidv4();
     if (response?.data?.name && response.data.command && !(response?.data?.name in commandStore)) {
         commandStore[response.data.name] = {
@@ -54,45 +73,69 @@ function createBulkCommand(commandStore, message, vscode) {
 
 
 
-function createNewTerminal(vscode, task, activeTerminals, TERMINAL_IdMap) {
-    if (!task?.name) {
-        vscode.window.showInformationMessage(`Action need proper name`);
+function createNewTerminal(data, common) {
+    //{ id: commandID, commandDescription: name, actualCommand: command }
+    const activityTerminal = common.activeTerminals();
+    const TERMINAL_IdMap = common.TERMINAL_IdMap();
+
+
+    if (!data?.id) {
+        common.vscode.window.showInformationMessage(`Action need proper name`);
         return;
     }
     // Check if a terminal with the same name is already running
-    if (activeTerminals[task?.name]) {
-        vscode.window.showInformationMessage(`${task.name} is already running.`);
+    if (activityTerminal[data.id]) {
+        common.vscode.window.showInformationMessage(`${data.commandDescription} is already running.`);
         return true; // retrun true on errror
     }
 
     // Retrieve the root directory of the current workspace
-    const workspaceFolders = vscode.workspace.workspaceFolders;
+    const workspaceFolders = common.vscode.workspace.workspaceFolders;
     const workspacePath = workspaceFolders ? workspaceFolders[0].uri.fsPath : undefined;
 
     // Create the terminal with the specified working directory if available
-    const terminal = vscode.window.createTerminal({
-        name: task?.name,
+    const terminal = common.vscode.window.createTerminal({
+        name: data.commandDescription,
         cwd: workspacePath // Set the working directory if the workspace exists
     });
 
-    // Store the terminal instance in activeTerminals using the task name
-    TERMINAL_IdMap.set(terminal, { terminal, name: task.name });
-    activeTerminals[task.name] = { terminal, name: task.name, command: task?.command };
+    // Store the terminal instance in activeTerminals using the data name
+    TERMINAL_IdMap.set(terminal, { terminal, name: data.commandDescription, projectId: data.projectId });
+    activityTerminal[data.id] = { terminal, id: data.id, projectId: data.projectId, name: data.commandDescription, command: data.actualCommand };
 
     // Show the terminal and run the specified command
     terminal.show();
-    terminal.sendText(task?.command);
+    terminal.sendText(data.actualCommand);
 
     return false;
 }
 
-function startTerminal(vscode, Actiondata, commandStore, activeTerminals, TERMINAL_IdMap) {
+function startTerminal(response, common) {
+    const { vscode, activeTerminals, TERMINAL_IdMap } = common;
+    const commandStore = common.commandStore();
+    const eachProjectIndex = common.eachProjectLocator();
+
     const commandThatCannotAbleToStart = [];
-    const { data: actions } = Actiondata;
+    const { data: stateOfCheckBOx } = response;
     //actions here means these are terminal name wich is checked  on ui and need to start it ,
     //so based on that we seting true or false on our commandStore object
-    Object.values(commandStore || {}).forEach(
-        singleActionObject => {
+
+    Object.values(stateOfCheckBOx || {}).forEach(
+        ({ checkedCheckBoxId, project: projectId } = {}) => {
+            const projectObject = commandStore[projectId];
+            Object.entries(checkedCheckBoxId)?.forEach(([keys, value]) => {
+                if (value) {
+                    const data = projectObject?.datas?.[keys];
+                    if (data) {
+                        const result = createNewTerminal({ ...data, projectId }, common);
+                        if (result) {
+                            commandThatCannotAbleToStart.push(data);
+                        }
+                    }
+
+                }
+
+            });
 
             if (actions[singleActionObject.id]) {
                 singleActionObject.checked = true;
@@ -150,9 +193,13 @@ function stopTerminal(vscode, Actiondata, commandStore, activeTerminals, TERMINA
 }
 
 
-function deleteActions(vscode, commands, commandStore, callBack, activeTerminals, TERMINAL_IdMap) {
+function deleteActions(response, common, callBack) {
 
-    vscode.window.showInformationMessage(
+
+
+    //vscode, commands, commandStore, callBack, activeTerminals, TERMINAL_IdMap
+
+    common.vscode.window.showInformationMessage(
         "Do you want Delete selected Actions",
         { modal: true }, // Makes it a modal dialog
         "Yes",
@@ -168,7 +215,7 @@ function deleteActions(vscode, commands, commandStore, callBack, activeTerminals
 
                 delete commandStore[id];
             });
-            vscode.window.showInformationMessage("Actions Deleted");
+            common.vscode.window.showInformationMessage("Deleted succesfully");
             callBack();
         }
     });

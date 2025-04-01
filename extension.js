@@ -5,45 +5,57 @@ const reStartView = require("./screens/Resolve");
 const vscode = require("vscode");
 
 
+const fancyProjectName = 'LaunchBoard';
 
 /**
  * keys of storess
  */
-const KEY_COMMANDS = 'runProject.dev.akash_c';
-const KEY_STATE = 'runProject.dev.akash_s';
-const KEY_PROJECTS = 'runProject.dev.akash_p';
-const KEY_NUMBER = 'runProject.dev.akash_n';
+const KEY_COMMANDS = 'LaunchBoard.dev.akash_c';
+const KEY_STATE = 'LaunchBoard.dev.akash_s';
+const KEY_PROJECTS = 'LaunchBoard.dev.akash_p';
+const KEY_NUMBER = 'LaunchBoard.dev.akash_n';
 /**
  * project name
  */
-const fancyProjectName = 'Run Project';
+
 
 
 /***
  * Actual object store the datas
  */
-let commandStore = [];
+let commandStore = {};
 let checkBoxState = {};
-let projectNames = {};
+let eachProjectLocator = [];
 let count = 0;
 const activeTerminals = {};
-const TERMINAL_IdMap = new Map();
+const TERMINAL_IdMap = new Map(); // used map here to store terminal refrence as key
 const cacheUI = {};
+
+let reloadUI = 0;
+let UiReloadedBy = {};
 
 
 
 function init(context) {
-  commandStore = context.globalState.get(KEY_COMMANDS) || [];
+  commandStore = context.globalState.get(KEY_COMMANDS) || {};
   checkBoxState = context.globalState.get(KEY_STATE) || {};
-  projectNames = context.globalState.get(KEY_PROJECTS) || {};
+  eachProjectLocator = context.globalState.get(KEY_PROJECTS) || [];
   count = context.globalState.get(KEY_NUMBER) || 0;
 }
 
 function loadOrRenderCacheUI(cacheKey, uiFunction, panel) {
   let cache = cacheUI[cacheKey];
-  if (!cache) {
+  if (!cache || reloadUI > 0 && !UiReloadedBy[cacheKey]) {
     cache = uiFunction?.();
     cacheUI[cacheKey] = cache;
+    if (reloadUI - 1 > -1) {
+      UiReloadedBy[cacheKey] = true;
+      reloadUI--;
+      if (reloadUI === 0) {
+        //reached 0; clearing all to once more allow reload
+        UiReloadedBy = {};
+      }
+    }
   }
   panel.webview.html = cache;
 }
@@ -90,8 +102,11 @@ function activate(context) {
 
   const common = {
     checkBoxState: () => checkBoxState,
+    setCheckBoxState: (newState = {}) => {
+      checkBoxState = newState;
+    },
     fancyProjectName,
-    projectNames: () => projectNames,
+    eachProjectLocator: () => eachProjectLocator,
     panel: () => panel,
     vscode,
     cacheUI: () => cacheUI,
@@ -102,21 +117,21 @@ function activate(context) {
   };
 
 
-  const Screen = vscode.commands.registerCommand('Run.ProjectUI', () => {
+  const Screen = vscode.commands.registerCommand('LaunchBoard', () => {
     // Check if the webview panel is already open
     if (panel) {
       setCachedUI("home", panel?.webview?.html || undefined);
       if (panel.visible) {
-        // ✅ If panel is currently visible, dispose (close) it
+        // If panel is currently visible, dispose (close) it
         panel.dispose();
         panel = null; // Reset the panel variable
       } else {
-        // ✅ If panel exists but is not visible, bring it to front
+        // If panel exists but is not visible, bring it to front
         panel.reveal(vscode.ViewColumn.One);
       }
     } else {
       panel = vscode.window.createWebviewPanel(
-        'RunProject',
+        'LaunchBoard',
         fancyProjectName,
         vscode.ViewColumn.One,
         {
@@ -153,36 +168,36 @@ function activate(context) {
               const result = createNewCommand(response, common);
               if (result) {
                 //persistStore('persistedCommand', commandStore);
-                setCachedUI("addNewCommand", addNewCommandUIpage(common));
+                reloadUI = 2; // logic wich allow two diffrent screen to alow new render not take cache
               }
               break;
             case 'createBulkCommands':
               const BulkedResult = createBulkCommand(commandStore, response, vscode);
               if (BulkedResult) {
-                persistStore('persistedCommand', commandStore);
+                //persistStore('persistedCommand', commandStore);
               }
               break;
             case "alert":
               vscode.window.showInformationMessage(response.data);
               break;
             case 'createTerminal':
-              const errorOnStart = startTerminal(vscode, response, commandStore, activeTerminals, TERMINAL_IdMap);
+              const errorOnStart = startTerminal(response, common);
               if (errorOnStart.length) {
                 panel.webview.html = reStartView(errorOnStart);
               } else {
                 panel.webview.html = HomePageUI(commandStore);
               }
-              persistStore('persistedCommand', commandStore);
+              //persistStore('persistedCommand', commandStore);
               break;
             case 'restartTerminal':
               reStartTerminal(vscode, response, commandStore, activeTerminals, TERMINAL_IdMap);
               panel.webview.html = HomePageUI(commandStore);
               break;
             case 'deleteActions':
-              deleteActions(vscode, response, commandStore, () => {
+              deleteActions(response, common, () => {
                 persistStore('persistedCommand', commandStore);
                 panel.webview.html = HomePageUI(commandStore);
-              }, activeTerminals, TERMINAL_IdMap);
+              });
               break;
             case 'stopActions':
               stopTerminal(vscode, response, commandStore, activeTerminals, TERMINAL_IdMap);
@@ -202,7 +217,7 @@ function activate(context) {
 
   // Create a status bar item with an icon
   const statusBarIcon = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-  statusBarIcon.command = 'Run.ProjectUI';
+  statusBarIcon.command = 'LaunchBoard';
   statusBarIcon.text = `$(zap) ${fancyProjectName}`;  // $(zap) is an icon from the Octicons set
   statusBarIcon.tooltip = `Open ${fancyProjectName}`;
   statusBarIcon.show();
