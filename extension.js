@@ -61,12 +61,13 @@ function init(context) {
   isStartup = context.globalState.get(KEY_STARTUP) || false;
 }
 
-function backup() {
-  CurrentContextVscode.globalState.update(KEY_COMMANDS, commandStore);
-  CurrentContextVscode.globalState.update(KEY_STATE, checkBoxState);
-  CurrentContextVscode.globalState.update(KEY_PROJECTS, eachProjectLocator);
-  CurrentContextVscode.globalState.update(KEY_NUMBER, count);
-  CurrentContextVscode.globalState.update(KEY_STARTUP, isStartup);
+function fullBackup({ KEY_COMMANDS: c, KEY_STATE: k, KEY_PROJECTS: p, KEY_NUMBER: n, KEY_STARTUP: t, all } = { all: true, KEY_COMMANDS, KEY_STATE, KEY_PROJECTS, KEY_NUMBER, KEY_STARTUP }) {
+
+  (all || c) && CurrentContextVscode.globalState.update(KEY_COMMANDS, commandStore);
+  (all || k) && CurrentContextVscode.globalState.update(KEY_STATE, checkBoxState);
+  (all || p) && CurrentContextVscode.globalState.update(KEY_PROJECTS, eachProjectLocator);
+  (all || n) && CurrentContextVscode.globalState.update(KEY_NUMBER, count);
+  (all || t) && CurrentContextVscode.globalState.update(KEY_STARTUP, isStartup);
 }
 
 function loadOrRenderCacheUI(cacheKey, uiFunction, panel) {
@@ -198,7 +199,7 @@ function activate(context) {
             case 'createCommand':
               const result = createNewCommand(response, common);
               if (result) {
-                backup();
+                fullBackup();
                 //persistStore('persistedCommand', commandStore);
                 reloadUI = 2; // logic wich allow two diffrent screen to alow new render not take cache
               }
@@ -236,6 +237,7 @@ function activate(context) {
               break;
             case 'allowStartup':
               isStartup = response.data || false;
+              setCachedUI("home", HomePageUI(common));
               vscode.window.showInformationMessage("Status Changed");
               break;
 
