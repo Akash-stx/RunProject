@@ -3,7 +3,7 @@ const { createNewCommand, startTerminal, deleteActions, createBulkCommand, reSta
 const HomePageUI = require("./screens/HomePageUI");
 const reStartView = require("./screens/Resolve");
 const vscode = require("vscode");
-
+const path = require('path');
 
 const fancyProjectName = 'LaunchBoard';
 
@@ -14,6 +14,19 @@ const KEY_COMMANDS = 'LaunchBoard.dev.akash_c';
 const KEY_STATE = 'LaunchBoard.dev.akash_s';
 const KEY_PROJECTS = 'LaunchBoard.dev.akash_p';
 const KEY_NUMBER = 'LaunchBoard.dev.akash_n';
+
+let iconcache = undefined;
+
+function getIcon(context) {
+  if (iconcache) {
+    return iconcache;
+  } else {
+    iconcache = vscode.Uri.file(
+      path.join(context.extensionPath, 'icon.png') // Icon is in the root folder
+    );
+    return iconcache;
+  }
+}
 /**
  * project name
  */
@@ -138,6 +151,7 @@ function activate(context) {
           enableScripts: true
         }
       );
+      panel.iconPath = getIcon(context);
 
       // When the panel is closed, reset the panel variable
       panel.onDidDispose(() => {

@@ -78,11 +78,22 @@ function addNewCommandUIpage({ eachProjectLocator } = {}) {
             #bulkDataLabel {
                 display: none;
             }
+
+             #headerr {
+                font-family: 'Arial', sans-serif;
+                font-size: 24px;
+                font-weight: bold;
+                text-align: center;
+                color: #4a90e2; /* Solid blue color */
+                margin: 20px 0;
+                padding-bottom: 5px;
+                border-bottom: 2px solid #4a90e2; /* Underline effect */
+            }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1>Create New Action : for Command Prompt</h1>
+            <h1 id="headerr">Add New Command</h1>
             <label><input type="checkbox" id="bulkToggle"> Enable Bulk Entry</label>
             <label for="searchBox">Project Name:</label>
             <input type="text" id="searchBox" placeholder="Enter the Project Name" required>

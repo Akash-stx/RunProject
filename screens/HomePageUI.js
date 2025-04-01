@@ -48,7 +48,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             UICreator.checkBoxData.push(`{project:${project.projectId} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
             return `<div class="project" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
             <div class="project-header" style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">
-                <label>
+                <label id="projectHeader">
                   <input type="checkbox" id="${project.projectId}" class="project-checkbox" data-project="${project.projectId}" ${checkboxSize === howmanychecked ? "checked" : ""}>
                   ${project.projectName}
                 </label>
@@ -58,7 +58,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             </div>
         </div>`
         }).join('')
-        : "<p id='noActionPresent'>No Actions Present</p>";
+        : "<p id='noActionPresent'>No actions available. Click 'Add' to create one!</p>";
 
 
     UICreator.checkBoxData.push("}");
@@ -79,14 +79,25 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 flex-direction: column;
                 align-items: center;
             }
-            h1 {
-                color: #333;
-            }
+            
             #actionsContainer {
                 width: 100%;
                 overflow-y: auto;
                 max-height: calc(100vh - 80px);
                 padding-bottom: 60px;
+            }
+
+            #noActionPresent {
+                font-family: monospace;
+                font-size: 16px;
+                font-weight: bold;
+                text-align: center;
+                color: #ff4d4d; /* A soft red color for emphasis */
+                background: #ffecec; /* Light red background */
+                padding: 10px;
+                border-radius: 6px;
+                border: 1px solid #ff9999;
+                margin: 10px 0;
             }
             .project {
                 margin-bottom: 20px;
@@ -103,8 +114,22 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             .commands {
                 margin-left: 20px;
             }
-            h1{
-                font-family: cursive;
+            #projectHeader {
+                font-family: 'Arial', sans-serif;
+                font-weight: bold;
+                color: #4a90e2;
+                padding-bottom: 5px;
+            }
+
+            #nameOfProject {
+                font-family: 'Arial', sans-serif;
+                font-size: 24px;
+                font-weight: bold;
+                text-align: center;
+                color: #4a90e2; /* Solid blue color */
+                margin: 20px 0;
+                padding-bottom: 5px;
+                border-bottom: 2px solid #4a90e2; /* Underline effect */
             }
             label {
                 display: flex;
@@ -160,7 +185,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
         </style>
     </head>
     <body>
-        <h1>${fancyProjectName}</h1>
+        <h1 id="nameOfProject">${fancyProjectName}</h1>
         <textarea id="exportData">${toExport}</textarea>
          
         <div id="actionsContainer">${checkboxesHtml}</div>
@@ -170,7 +195,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             <button id="stopButton">Stop Selected</button>
             <button id="deleteButton">Delete Selected</button>
             <button id="exportButton">Copy All Selected as JSON</button>
-            <button id="createNewAction">Create New Action</button>
+            <button id="createNewAction">Add</button>
         </div>
 
         <script>
