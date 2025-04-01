@@ -70,8 +70,8 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
         <title>Checkboxes with Actions</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
-                //font-family: cursive;
+                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
+                line-height: 1.5; /* Improve readability */
                 background-color: #f4f4f4;
                 margin: 0;
                 padding: 20px;
@@ -115,21 +115,39 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 margin-left: 20px;
             }
             #projectHeader {
-                font-family: 'Arial', sans-serif;
-                font-weight: bold;
+                font-weight: bold; 
+                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
+                font-size: 15px; /* Adjust size as needed */
+                line-height: 1.5; /* Improve readability */
+                font-style: italic;
                 color: #4a90e2;
                 padding-bottom: 5px;
             }
 
+            .command-item {
+                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
+                font-size: 14px; /* Adjust size as needed */
+                line-height: 1.5; /* Improve readability */
+                font-weight: 500;
+            }
+
+
             #nameOfProject {
-                font-family: 'Arial', sans-serif;
-                font-size: 24px;
-                font-weight: bold;
+                font-family: 'Lora', serif; /* Elegant, readable serif */
+                font-size: 28px;
+                font-weight: 600;
                 text-align: center;
-                color: #4a90e2; /* Solid blue color */
-                margin: 20px 0;
-                padding-bottom: 5px;
-                border-bottom: 2px solid #4a90e2; /* Underline effect */
+                color: #4a90e2; 
+                margin: 30px 0;
+                border-bottom: 2px solid #ccc; /* Light grey border */
+                letter-spacing: 1px;
+            }
+
+            @media (max-width: 600px) {
+                #nameOfProject {
+                    font-size: 24px;
+                    margin: 20px 0;
+                }
             }
             label {
                 display: flex;

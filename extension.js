@@ -117,10 +117,10 @@ function activate(context) {
 
   // Handle terminal close event
   vscode.window.onDidCloseTerminal(Terminal => {
-    const { terminal, name } = TERMINAL_IdMap.get(Terminal);
+    const { terminal, name, id } = TERMINAL_IdMap.get(Terminal);
     if (terminal && name) {
       TERMINAL_IdMap.delete(Terminal);
-      delete activeTerminals[name];
+      delete activeTerminals[id];
       vscode.window.showInformationMessage(`${name} has been closed.`);
     }
   });

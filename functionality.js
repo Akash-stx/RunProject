@@ -100,7 +100,7 @@ function createNewTerminal(data, common) {
     });
 
     // Store the terminal instance in activeTerminals using the data name
-    TERMINAL_IdMap.set(terminal, { terminal, name: data.commandDescription, projectId: data.projectId });
+    TERMINAL_IdMap.set(terminal, { terminal, name: data.commandDescription, projectId: data.projectId, id: data.id });
     activityTerminal[data.id] = { terminal, id: data.id, projectId: data.projectId, name: data.commandDescription, command: data.actualCommand };
 
     // Show the terminal and run the specified command
@@ -111,9 +111,9 @@ function createNewTerminal(data, common) {
 }
 
 function startTerminal(response, common) {
-    const { vscode, activeTerminals, TERMINAL_IdMap } = common;
+    //const { vscode, activeTerminals, TERMINAL_IdMap } = common;
     const commandStore = common.commandStore();
-    const eachProjectIndex = common.eachProjectLocator();
+    // const eachProjectIndex = common.eachProjectLocator();
 
     const commandThatCannotAbleToStart = [];
     const { data: stateOfCheckBOx } = response;
@@ -121,15 +121,19 @@ function startTerminal(response, common) {
     //so based on that we seting true or false on our commandStore object
 
     Object.values(stateOfCheckBOx || {}).forEach(
-        ({ checkedCheckBoxId, project: projectId } = {}) => {
+        ({ checkedCheckBoxId, project: projectId, current: currentSelected } = {}) => {
+            if (currentSelected < 1) {
+                return;
+            }
             const projectObject = commandStore[projectId];
             Object.entries(checkedCheckBoxId)?.forEach(([keys, value]) => {
                 if (value) {
                     const data = projectObject?.datas?.[keys];
                     if (data) {
-                        const result = createNewTerminal({ ...data, projectId }, common);
+                        const newObject = { ...data, projectId };
+                        const result = createNewTerminal(newObject, common);
                         if (result) {
-                            commandThatCannotAbleToStart.push(data);
+                            commandThatCannotAbleToStart.push(newObject);
                         }
                     }
 
