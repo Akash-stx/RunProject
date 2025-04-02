@@ -5,6 +5,8 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
     const checkedState = checkBoxState(); // load the data like wich is checkbox seleected wich is not
     const projectLocater = eachProjectLocator();
 
+    const autostartEnabled = getIsStartupSelected();
+
     const toExport = JSON.stringify(actions);
 
     const UICreator = {
@@ -283,10 +285,10 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             
            <div class="tooltip-container">
             <label class="switch">
-                <input type="checkbox" id="startupToggle"  ${getIsStartupSelected() ? "checked" : ""}>
+                <input type="checkbox" id="startupToggle"  ${autostartEnabled ? "checked" : ""}>
                 <span class="slider"></span>
             </label>
-            <span class="tooltip">Enable Auto-Start</span>
+            <span class="tooltip" id="tooltipText" > ${autostartEnabled ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
             </div>
             
             
@@ -297,12 +299,20 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             const stateOfCheckBOx=${UICreator.checkBoxData.join("")};
 
             const toggle = document.getElementById("startupToggle");
+            const tooltipText = document.getElementById("tooltipText");
 
             toggle.addEventListener("change", function() {
+            
                 vscode.postMessage({
                         callMethod: 'allowStartup',
                         data: this.checked
                     });
+
+                    if(this.checked){
+                     tooltipText.textContent ="Auto-Start: Enabled!";
+                    }else{
+                     tooltipText.textContent ="Auto-Start: Disabled";
+                    }
             });
             
             

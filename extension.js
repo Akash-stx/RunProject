@@ -244,7 +244,7 @@ function activate(context) {
               isStartup = response.data || false;
               setCachedUI("home", HomePageUI(common));
               fullBackup({ KEY_STARTUP });
-              vscode.window.showInformationMessage("Status Changed");
+              //vscode.window.showInformationMessage("Status Changed");
               break;
 
           }
