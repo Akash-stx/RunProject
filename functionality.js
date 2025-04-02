@@ -43,20 +43,7 @@ function createNewCommand(response, common) {
     }
     common.vscode.window.showInformationMessage('New command is created');
     return true;
-    // const uuid = uuidv4();
-    if (response?.data?.name && response.data.command && !(response?.data?.name in commandStore)) {
-        commandStore[response.data.name] = {
-            id: response.data.name,
-            name: response.data.name,
-            command: response.data.command,
-            checked: false,
-        }
-        vscode.window.showInformationMessage('New Action command is created');
-        return true
-    } else {
-        vscode.window.showInformationMessage("Action name required or already exists.");
-        return false
-    }
+
 }
 
 function createBulkCommand(commandStore, message, vscode) {
@@ -165,43 +152,62 @@ function startTerminal(response, common) {
     return commandThatCannotAbleToStart;
 }
 
-function reStartTerminal(vscode, Actiondata, commandStore, activeTerminals, TERMINAL_IdMap) {
-    const { data: reStartIssues } = Actiondata;
-    //actions here means these are terminal name wich is checked  on ui and need to start it ,
-    //so based on that we seting true or false on our commandStore object
-    reStartIssues?.forEach((nameasId) => {
-        const commandsData = commandStore[nameasId]
-        if (commandsData) {
-            const { terminal } = activeTerminals[nameasId] || {}
-            if (terminal) {
-                // Close the terminal
-                terminal.dispose();
-                delete activeTerminals[nameasId];
-                TERMINAL_IdMap.delete(terminal);
-                createNewTerminal(vscode, commandsData, activeTerminals, TERMINAL_IdMap);
-            } else {
-                createNewTerminal(vscode, commandsData, activeTerminals, TERMINAL_IdMap);
-            }
+function reStartTerminal(response, common) {
+    const { data: selectedCheckbox } = response;
+    const eachProjectLocator = common.eachProjectLocator();
+    const commandStore = common.commandStore();
+
+    const TERMINAL_IdMap = common.TERMINAL_IdMap();
+    const activeTerminals = common.activeTerminals();
+
+    let isRestartHappened = false;
+
+    eachProjectLocator?.forEach?.((projectObject) => {
+        const { checkedCheckBoxId, current, total } = selectedCheckbox[projectObject.projectId];
+
+        if (total && current > 0) {
+            const { datas } = commandStore[projectObject.projectId];
+            projectObject?.children?.forEach((id) => {
+                const { terminal } = activeTerminals[id] || {}
+                if (checkedCheckBoxId[id] && terminal) {
+                    terminal.dispose();
+                    delete activeTerminals[id];
+                    TERMINAL_IdMap.delete(terminal);
+                    createNewTerminal(datas[id], common);
+                } else {
+                    createNewTerminal(datas[id], common);
+                }
+
+            })
         }
-
-    })
-
+    });
 }
 
 
-function stopTerminal(vscode, Actiondata, commandStore, activeTerminals, TERMINAL_IdMap) {
-    const { data: stopTerminalName } = Actiondata;
-    //actions here means these are terminal name wich is checked  on ui and need to start it ,
-    //so based on that we seting true or false on our commandStore object
-    stopTerminalName?.forEach((nameasId) => {
-        const { terminal } = activeTerminals[nameasId] || {}
-        if (terminal) {
-            // Close the terminal
-            terminal.dispose();
-            TERMINAL_IdMap.delete(terminal);
-            delete activeTerminals[nameasId];
+function stopTerminal(response, common) {
+    const { data: selectedCheckbox } = response;
+    const eachProjectLocator = common.eachProjectLocator();
+
+    const TERMINAL_IdMap = common.TERMINAL_IdMap();
+    const activeTerminals = common.activeTerminals();
+
+    let isStopHappened = false;
+
+    eachProjectLocator?.forEach?.((projectObject) => {
+        const { checkedCheckBoxId, current, total } = selectedCheckbox[projectObject.projectId];
+
+        if (total && current > 0) {
+            projectObject?.children?.forEach((id) => {
+                const { terminal } = activeTerminals[id] || {}
+                if (checkedCheckBoxId[id] && terminal) {
+                    terminal.dispose();
+                    delete activeTerminals[id];
+                    TERMINAL_IdMap.delete(terminal);
+                }
+
+            })
         }
-    })
+    });
 
 }
 
@@ -209,11 +215,12 @@ function stopTerminal(vscode, Actiondata, commandStore, activeTerminals, TERMINA
 function deleteActions(response, common, callBack) {
     const eachProjectLocator = common.eachProjectLocator();
     const commandStore = common.commandStore();
-
+    // const activeTerminals = common.activeTerminals();
+    let isDeleteHappened = false;
     const { data: stateOfCheckBOx } = response;
 
     common.vscode.window.showInformationMessage(
-        "Do you want Delete selected Actions",
+        "Do you want to delete? Make sure you have selected the correct option.",
         { modal: true }, // Makes it a modal dialog
         "Yes",
         "No"
@@ -221,15 +228,13 @@ function deleteActions(response, common, callBack) {
         if (userChoice === "Yes") {
             const newProjectLocaterObject = [];
 
-            eachProjectLocator?.forEach((projectObject) => {
-                const { checkedCheckBoxId,
-                    current,
-
-                    total } = stateOfCheckBOx[projectObject.projectId];
+            eachProjectLocator?.forEach?.((projectObject) => {
+                const { checkedCheckBoxId, current, total } = stateOfCheckBOx[projectObject.projectId];
 
                 if (total && total === current) {
                     //this show all checkbox is selected 
                     delete commandStore[projectObject.projectId];
+                    !isDeleteHappened && (isDeleteHappened = true);
                     return;
                 }
 
@@ -239,6 +244,7 @@ function deleteActions(response, common, callBack) {
                     projectObject?.children?.forEach((id) => {
                         if (checkedCheckBoxId[id]) {
                             delete datas[id];
+                            !isDeleteHappened && (isDeleteHappened = true);
                             return;
                         }
                         newChildrenId.push(id);
@@ -247,8 +253,11 @@ function deleteActions(response, common, callBack) {
                 }
                 newProjectLocaterObject.push(projectObject);
             });
-
-            common.vscode.window.showInformationMessage("Deleted succesfully");
+            if (isDeleteHappened) {
+                common.vscode.window.showInformationMessage("Deleted succesfully");
+            } else {
+                common.vscode.window.showInformationMessage("Deletion failed.");
+            }
             common.setEachProjectLocator(newProjectLocaterObject);
             callBack();
         }

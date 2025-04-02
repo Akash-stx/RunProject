@@ -8,8 +8,13 @@ function addNewCommandUIpage({ eachProjectLocator } = {}) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>New Action Form</title>
         <style>
+
+         
             body {
-                font-family: Arial, sans-serif;
+                font-weight: bold;
+                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
+                font-size: 15px; /* Adjust size as needed */
+                line-height: 1.5; /* Improve readability */
                 padding: 20px;
                 background-color: #f0f0f0;
                 display: flex;

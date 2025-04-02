@@ -226,8 +226,8 @@ function activate(context) {
               //persistStore('persistedCommand', commandStore);
               break;
             case 'restartTerminal':
-              reStartTerminal(vscode, response, commandStore, activeTerminals, TERMINAL_IdMap);
-              panel.webview.html = HomePageUI(commandStore);
+              reStartTerminal(response, common);
+              //loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
               break;
             case 'deleteActions':
               deleteActions(response, common, () => {
@@ -238,7 +238,7 @@ function activate(context) {
               });
               break;
             case 'stopActions':
-              stopTerminal(vscode, response, commandStore, activeTerminals, TERMINAL_IdMap);
+              stopTerminal(response, common);
               break;
             case 'allowStartup':
               isStartup = response.data || false;

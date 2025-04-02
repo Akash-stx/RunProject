@@ -93,11 +93,11 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 font-size: 15px; /* Adjust size as needed */
                 line-height: 1.5; /* Improve readability */
                 text-align: center;
-                color: #e24a60;
+                color:rgb(153, 38, 55);
                 background: #f6f6f5;
                 padding: 10px;
                 border-radius: 6px;
-                border: 1px solid #4a90e2;
+                border: 2px solid #ccc;
                 margin: 10px 0;
             }
             .project {
@@ -140,7 +140,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 text-align: center;
                 color: #4a90e2; 
                 margin: 30px 0;
-                border-bottom: 2px solid #ccc; /* Light grey border */
+                border-bottom: 2px solid rgb(0, 0, 0); /* Light grey border */
                 letter-spacing: 1px;
             }
 
@@ -238,7 +238,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
 
             .tooltip {
                 position: relative;
-                top: 5px;
+                top: 3px;
                 font-weight: 600;
                 color: black;
                 margin-right: 10px;
@@ -354,26 +354,26 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                      }
                      
                 }
-                      console.log(stateOfCheckBOx);
+                    
             });
 
             document.getElementById('exportButton').addEventListener('click', () => {
                 const exportData = document.getElementById('exportData');
-                exportData.select(); // Selects the content inside the textarea
-                document.execCommand('copy'); // Copies the selected text to clipboard
+                exportData.select(); 
+                document.execCommand('copy');
 
                  
                  vscode.postMessage({
-                            callMethod: 'alert',
-                            data: "Data copied to clipboard!"
-                        });
+                       callMethod: 'alert',
+                       data: "Data copied to clipboard!"
+                  });
+
             });
 
 
 
             document.getElementById('deleteButton').addEventListener('click', function() {
-                // const checkedItems = Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked'))
-
+               
                     vscode.postMessage({
                         callMethod: 'deleteActions',
                         data: stateOfCheckBOx
@@ -383,28 +383,22 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
 
 
             document.getElementById('stopButton').addEventListener('click', function() {
-                const checkedItems = Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked'))
-                    .map(input => input.id);
 
-                if (checkedItems?.length) {
                     vscode.postMessage({
                         callMethod: 'stopActions',
-                        data: checkedItems
+                        data: stateOfCheckBOx
                     });
-                }
+                
             });
 
 
             document.getElementById('restartButton').addEventListener('click', function() {
-                const checkedItems = Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked'))
-                    .map(input => input.id);
 
-                if (checkedItems?.length) {
                     vscode.postMessage({
                         callMethod: 'restartTerminal',
-                        data: checkedItems
+                        data: stateOfCheckBOx
                     });
-                }
+                
             });
             
             
@@ -415,6 +409,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                     data: null
                 });
             });
+
         </script>
     </body>
     </html>`;
