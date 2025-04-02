@@ -85,8 +85,8 @@ function Resolve(data) {
             }
 
             #noActionPresent{
-            text-align: center;
-            color: black;
+             text-align: center;
+             color: black;
             }
 
         </style>

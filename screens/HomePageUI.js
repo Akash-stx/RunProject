@@ -88,9 +88,10 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             }
 
             #noActionPresent {
-                font-family: monospace;
-                font-size: 16px;
                 font-weight: bold;
+                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
+                font-size: 15px; /* Adjust size as needed */
+                line-height: 1.5; /* Improve readability */
                 text-align: center;
                 color: #e24a60;
                 background: #f6f6f5;
