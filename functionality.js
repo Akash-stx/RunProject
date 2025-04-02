@@ -9,18 +9,27 @@ function createNewCommand(response, common) {
     if (currentProjectFromArray) { // already this project is present 
         const project = mainCommandObject[currentProjectFromArray.projectId];
         const commandID = common.count();
-        project.datas[commandID] = { id: commandID, projectId: commandID.projectId, commandDescription: name, actualCommand: command };
+
+        if (currentProjectFromArray.children) {
+            currentProjectFromArray.children.push(commandID);
+        } else {
+            currentProjectFromArray.children = [commandID]
+        }
+        project.datas[commandID] = { id: commandID, projectId: project.projectId, commandDescription: name, actualCommand: command };
 
     } else {
         const projectId = common.count();
+        const commandID = common.count();
+
         const savedIndex = eachProjectLocator.push({
             projectId: projectId,
             projectName: projectName,
             projectNameSmallCase: projectName.toLowerCase(),
-            searchBox: `'${projectName}'`
+            searchBox: `'${projectName}'`,
+            children: [commandID]
         });
 
-        const commandID = common.count();
+
         mainCommandObject[projectId] = {
             projectId: projectId,
             projectName: projectName,
@@ -113,7 +122,7 @@ function createNewTerminal(data, common) {
 function startTerminal(response, common) {
     //const { vscode, activeTerminals, TERMINAL_IdMap } = common;
     const commandStore = common.commandStore();
-    // const eachProjectIndex = common.eachProjectLocator();
+    const eachProjectIndex = common.eachProjectLocator();
 
     const commandThatCannotAbleToStart = [];
     const { data: stateOfCheckBOx } = response;
@@ -198,10 +207,10 @@ function stopTerminal(vscode, Actiondata, commandStore, activeTerminals, TERMINA
 
 
 function deleteActions(response, common, callBack) {
+    const eachProjectLocator = common.eachProjectLocator();
+    const commandStore = common.commandStore();
 
-
-
-    //vscode, commands, commandStore, callBack, activeTerminals, TERMINAL_IdMap
+    const { data: stateOfCheckBOx } = response;
 
     common.vscode.window.showInformationMessage(
         "Do you want Delete selected Actions",
@@ -210,16 +219,37 @@ function deleteActions(response, common, callBack) {
         "No"
     ).then((userChoice) => {
         if (userChoice === "Yes") {
-            commands.data?.forEach(id => {
-                const { terminal } = activeTerminals[id] || {};
-                if (terminal) {
-                    TERMINAL_IdMap.delete(terminal);
-                    delete activeTerminals[id];
+            const newProjectLocaterObject = [];
+
+            eachProjectLocator?.forEach((projectObject) => {
+                const { checkedCheckBoxId,
+                    current,
+
+                    total } = stateOfCheckBOx[projectObject.projectId];
+
+                if (total && total === current) {
+                    //this show all checkbox is selected 
+                    delete commandStore[projectObject.projectId];
+                    return;
                 }
 
-                delete commandStore[id];
+                if (total && current > 0) {
+                    const newChildrenId = [];
+                    const { datas } = commandStore[projectObject.projectId];
+                    projectObject?.children?.forEach((id) => {
+                        if (checkedCheckBoxId[id]) {
+                            delete datas[id];
+                            return;
+                        }
+                        newChildrenId.push(id);
+                    })
+                    projectObject.children = newChildrenId;
+                }
+                newProjectLocaterObject.push(projectObject);
             });
+
             common.vscode.window.showInformationMessage("Deleted succesfully");
+            common.setEachProjectLocator(newProjectLocaterObject);
             callBack();
         }
     });

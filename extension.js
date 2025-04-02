@@ -134,6 +134,9 @@ function activate(context) {
     setCheckBoxState: (newState = {}) => {
       checkBoxState = newState;
     },
+    setEachProjectLocator: (newRefrenceOfArray = []) => {
+      eachProjectLocator = newRefrenceOfArray;
+    },
     fancyProjectName,
     eachProjectLocator: () => eachProjectLocator,
     panel: () => panel,
@@ -218,7 +221,7 @@ function activate(context) {
               if (errorOnStart.length) {
                 panel.webview.html = reStartView(errorOnStart);
               } else {
-                panel.webview.html = HomePageUI(commandStore);
+                panel.webview.html = HomePageUI(common);
               }
               //persistStore('persistedCommand', commandStore);
               break;
@@ -228,8 +231,10 @@ function activate(context) {
               break;
             case 'deleteActions':
               deleteActions(response, common, () => {
-                persistStore('persistedCommand', commandStore);
-                panel.webview.html = HomePageUI(commandStore);
+                //persistStore('persistedCommand', commandStore);
+                fullBackup();
+                setCachedUI("home", HomePageUI(common));
+                loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
               });
               break;
             case 'stopActions':
@@ -238,6 +243,7 @@ function activate(context) {
             case 'allowStartup':
               isStartup = response.data || false;
               setCachedUI("home", HomePageUI(common));
+              fullBackup({ KEY_STARTUP });
               vscode.window.showInformationMessage("Status Changed");
               break;
 
