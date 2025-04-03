@@ -2,12 +2,17 @@ function Resolve(data) {
     const actions = Object.values(data);
     const checkboxesHtml = actions?.length ? actions
         .map(item => `
-      <div class="item">
-        <label>
-          <input type="checkbox" id="${item.id}" ${item.checked ? 'checked' : ''}>
-          ${item.name}
-        </label>
-      </div>
+           <div class="parent">
+            <div class="parent-name">${item.name}</div>
+            <div class="items-container">
+                <div class="item">
+                <label>
+                    <input type="checkbox" id="${item.id}" ${item.checked ? 'checked' : ''}>
+                    ${item.name}
+                </label>
+                </div>
+            </div>
+            </div>
     `).join('') : "<p id='noActionPresent' >No Actions Present</p>";
 
     return `<!DOCTYPE html>
@@ -18,26 +23,48 @@ function Resolve(data) {
         <title>Checkboxes with Actions</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f4;
-                margin: 0;
-                padding: 20px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+                    font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
+                    line-height: 1.5;
+                    background-color: #f4f4f4;
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
             }
             h1 {
                 color: #333;
             }
-            .item {
-                margin-bottom: 15px;
-                padding: 10px;
-                background: #ffffff;
-                border-radius: 5px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                display: flex;
-                align-items: center;
-            }
+            .parent {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.parent-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.items-container {
+    padding-left: 10px; /* Indent items under parent */
+}
+
+.item {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+}
             label {
                 display: flex;
                 align-items: center;
@@ -78,10 +105,17 @@ function Resolve(data) {
                 transform: translateY(-1px);
             }
                 
-            .button-container {
+             .button-container {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+                padding: 10px;
                 display: flex;
-                justify-content: center; /* Center buttons */
-                width: 100%; /* Full width for button container */
+                justify-content: center;
+                z-index: 10;
             }
 
             #noActionPresent{
@@ -92,13 +126,15 @@ function Resolve(data) {
         </style>
     </head>
     <body>
-        <h1>Unable to Run: It May Already Be Active, Please Resolve Manually</h1>
+        <h1>Manual Resolution: Check if already active and resolve.</h1>
         <div id="checkboxes">
           ${checkboxesHtml}
         </div>
+        
+
         <div class="button-container">
             <button id="runButton">Restart Selected</button>
-            <button id="viewActionList">Go to Action List</button>
+            <button id="viewActionList">Back</button>
         </div>
 
         <script>

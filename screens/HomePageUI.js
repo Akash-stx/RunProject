@@ -72,24 +72,28 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
         <title>Checkboxes with Actions</title>
         <style>
             body {
-                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
-                line-height: 1.5; /* Improve readability */
-                background-color: #f4f4f4;
-                margin: 0;
-                padding: 20px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+                    font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
+                    line-height: 1.5;
+                    background-color: #f4f4f4;
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    height: 100vh;
+                    overflow: hidden; /* Prevents entire page from scrolling */
             }
             
             #actionsContainer {
+                flex: 1;
                 width: 100%;
                 overflow-y: auto;
-                max-height: calc(100vh - 80px);
-                padding-bottom: 60px;
+                margin-top: 98px; /* Adjust based on heading height */
+                padding-bottom: 80px; /* Ensures space above button-container */
             }
 
             #noActionPresent {
+
                 font-weight: bold;
                 font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
                 font-size: 15px; /* Adjust size as needed */
@@ -136,14 +140,17 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
 
 
             #nameOfProject {
-                font-family: 'Lora', serif; /* Elegant, readable serif */
-                font-size: 28px;
-                font-weight: 600;
-                text-align: center;
-                color: #4a90e2; 
-                margin: 30px 0;
-                border-bottom: 2px solid rgb(0, 0, 0); /* Light grey border */
-                letter-spacing: 1px;
+                    position: fixed;
+                    top: -26px;
+                    width: 100%;
+                    background: white;
+                    text-align: center;
+                    padding: 10px 0;
+                    font-size: 44px;
+                    font-weight: 600;
+                    color: #4a90e2;
+                    border-bottom: 2px solid black;
+                    z-index: 10;
             }
 
             @media (max-width: 600px) {

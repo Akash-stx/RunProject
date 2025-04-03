@@ -137,18 +137,10 @@ function startTerminal(response, common) {
 
             });
 
-            // if (actions[singleActionObject.id]) {
-            //     singleActionObject.checked = true;
-            //     const result = createNewTerminal(vscode, singleActionObject, activeTerminals, TERMINAL_IdMap);
-            //     if (result) {
-            //         commandThatCannotAbleToStart.push(singleActionObject);//name
-            //     }
-            // } else {
-            //     singleActionObject.checked = false;
-            // }
         }
-    );
 
+    );
+    common.setCheckBoxState(stateOfCheckBOx);
     return commandThatCannotAbleToStart;
 }
 

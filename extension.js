@@ -5,6 +5,9 @@ const reStartView = require("./screens/Resolve");
 const vscode = require("vscode");
 const path = require('path');
 
+/**
+ * project name
+ */
 const fancyProjectName = 'LaunchBoard';
 
 /**
@@ -28,9 +31,7 @@ function getIcon(context) {
     return iconcache;
   }
 }
-/**
- * project name
- */
+
 
 
 
@@ -50,6 +51,11 @@ const cacheUI = {};
 
 let reloadUI = 0;
 let UiReloadedBy = {};
+
+function allowUIReload(Times) {
+  reloadUI = Times;
+  UiReloadedBy = {};
+}
 
 
 
@@ -154,15 +160,14 @@ function activate(context) {
   const Screen = vscode.commands.registerCommand('LaunchBoard', () => {
     // Check if the webview panel is already open
     if (panel) {
-      //setCachedUI("home", panel?.webview?.html || undefined);
+
       if (panel.visible) {
-        // If panel is currently visible, dispose (close) it
         panel.dispose();
-        panel = null; // Reset the panel variable
+        panel = null;
       } else {
-        // If panel exists but is not visible, bring it to front
         panel.reveal(vscode.ViewColumn.One);
       }
+
     } else {
       panel = vscode.window.createWebviewPanel(
         'LaunchBoard',
@@ -203,8 +208,8 @@ function activate(context) {
               const result = createNewCommand(response, common);
               if (result) {
                 fullBackup();
-                //persistStore('persistedCommand', commandStore);
-                reloadUI = 2; // logic wich allow two diffrent screen to alow new render not take cache
+                allowUIReload(2); // logic wich allow two diffrent screen to alow new render not take cache
+
               }
               break;
             case 'createBulkCommands':
@@ -218,12 +223,13 @@ function activate(context) {
               break;
             case 'createTerminal':
               const errorOnStart = startTerminal(response, common);
+              fullBackup({ KEY_STATE });
+              setCachedUI("home", HomePageUI(common));
+              loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
               if (errorOnStart.length) {
                 panel.webview.html = reStartView(errorOnStart);
-              } else {
-                panel.webview.html = HomePageUI(common);
               }
-              //persistStore('persistedCommand', commandStore);
+
               break;
             case 'restartTerminal':
               reStartTerminal(response, common);
@@ -242,7 +248,6 @@ function activate(context) {
               break;
             case 'allowStartup':
               isStartup = response.data || false;
-              setCachedUI("home", HomePageUI(common));
               fullBackup({ KEY_STARTUP });
               //vscode.window.showInformationMessage("Status Changed");
               break;
@@ -273,7 +278,7 @@ function activate(context) {
   context.subscriptions.push(statusBarIcon);
 
   if (isStartup) {
-    createNewTerminal({ id: 33, commandDescription: 'ddd', actualCommand: "dddawdq" }, common);
+    startTerminal({ data: common.checkBoxState() }, common);
   }
 }
 
