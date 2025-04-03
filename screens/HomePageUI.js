@@ -57,7 +57,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 </label>
             </div>
              
-            <div class="commands" style="margin-left: 20px;margin-bottom: 10px;">
+            <div class="commands" style="margin-left: 24px;margin-bottom: 8px;margin-top: 12px;">
                 ${innerCheckBox}
             </div>
 
@@ -255,7 +255,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 border-width: medium;
                 border-style: solid;
                 position: relative;
-                left: 8px;
+                left: -10px;
                 top: 8px;
             }
 
