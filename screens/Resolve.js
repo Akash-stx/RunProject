@@ -1,19 +1,18 @@
-function Resolve(data) {
-    const actions = Object.values(data);
-    const checkboxesHtml = actions?.length ? actions
-        .map(item => `
+function Resolve(toResolve = []) {
+    const checkboxesHtml = toResolve?.length ? toResolve
+        .map((project) => `
            <div class="parent">
-            <div class="parent-name">${item.name}</div>
+            <div class="parent-name">${project.projectName}</div>
             <div class="items-container">
                 <div class="item">
                 <label>
-                    <input type="checkbox" id="${item.id}" ${item.checked ? 'checked' : ''}>
-                    ${item.name}
+                    <input type="checkbox" data-project="${project.projectId}" data-id="${project.id}" >
+                    ${project.commandDescription}
                 </label>
                 </div>
             </div>
             </div>
-    `).join('') : "<p id='noActionPresent' >No Actions Present</p>";
+    `).join('') : "<p id='noActionPresent' >All Good</p>";
 
     return `<!DOCTYPE html>
     <html lang="en">
@@ -32,39 +31,39 @@ function Resolve(data) {
                     flex-direction: column;
                     align-items: center;
             }
-            h1 {
-                color: #333;
-            }
+                h1 {
+                    color: #333;
+                    padding: 10px;
+                }
             .parent {
-    margin-bottom: 20px;
-    padding: 10px;
-    background: #f8f8f8;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+                margin-bottom: 20px;
+                padding: 10px;
+                    padding-left: 20px;
+                background: #f8f8f8;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
 
-.parent-name {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    padding-bottom: 5px;
-    border-bottom: 2px solid #ddd;
-    margin-bottom: 10px;
-}
+            .parent-name {
+                    margin-left: -8px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #333;
+                padding-bottom: 5px;
+                border-bottom: 1px solid #ddd;
+                margin-bottom: 10px;
+            }
 
-.items-container {
-    padding-left: 10px; /* Indent items under parent */
-}
+            .items-container {
+                padding-left: 10px; /* Indent items under parent */
+            }
 
-.item {
-    margin-bottom: 10px;
-    padding: 8px;
-    background: #ffffff;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-}
+            .item {
+                margin-bottom: 10px;
+                padding: 3px;
+                display: flex;
+                align-items: center;
+            }
             label {
                 display: flex;
                 align-items: center;
@@ -122,11 +121,28 @@ function Resolve(data) {
              text-align: center;
              color: black;
             }
+             #checkboxes  {
+                margin-top: 85px;
+            }
+
+            #nameOfProject {
+                    position: fixed;
+                    top: -13px;
+                    width: 100%;
+                    background: white;
+                    text-align: center;
+                    padding: 10px 0;
+                    font-size: 29px;
+                    font-weight: 600;
+                    color: #4a90e2;
+                    border-bottom: 2px solid black;
+                    z-index: 10;
+            }
 
         </style>
     </head>
     <body>
-        <h1>Manual Resolution: Check if already active and resolve.</h1>
+        <h1 id="nameOfProject" >Manual Resolution: Check if already active and resolve.</h1>
         <div id="checkboxes">
           ${checkboxesHtml}
         </div>
@@ -150,19 +166,34 @@ function Resolve(data) {
 
            
             document.getElementById('runButton').addEventListener('click', function() {
-                const result=[];
+                const result={};
+                let anycreated=false;
                 const checkedItems = Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked'));
 
-                  checkedItems.forEach(input => {
-                   result.push(input.id);
+                  checkedItems.forEach((input) => {
+                    const projectId = input.dataset.project;
+                    const checkBoxId = input.dataset.id;
+                    if(result[projectId]){
+                      result[projectId].checkedCheckBoxId[checkBoxId]=true;
+                      result[projectId].current=result[projectId].current+1;
+                      result[projectId].total=result[projectId].total+1;
+                    }else{
+                        anycreated=true;
+                        result[projectId]={
+                            checkedCheckBoxId:{[checkBoxId]:true},
+                            current:1,
+                            total:1
+                        }
+                    }
+
                    });
 
-                  if (result?.length) {
+                  if (anycreated) {
                     vscode.postMessage({
                         callMethod: 'restartTerminal',
                         data: result
                     });
-                }
+                  }
                
             });
 

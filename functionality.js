@@ -91,7 +91,7 @@ function createNewTerminal(data, common) {
 
     // Create the terminal with the specified working directory if available
     const terminal = common.vscode.window.createTerminal({
-        name: data.commandDescription,
+        name: `${common.fancyProjectName} → ${data.commandDescription}`,
         cwd: workspacePath // Set the working directory if the workspace exists
     });
 
@@ -126,7 +126,7 @@ function startTerminal(response, common) {
                 if (value) {
                     const data = projectObject?.datas?.[keys];
                     if (data) {
-                        const newObject = { ...data, projectId };
+                        const newObject = { ...data, projectId, projectName: projectObject?.projectName };
                         const result = createNewTerminal(newObject, common);
                         if (result) {
                             commandThatCannotAbleToStart.push(newObject);
@@ -188,7 +188,7 @@ function reStartTerminal(response, common) {
     let isRestartHappened = false;
 
     eachProjectLocator?.forEach?.((projectObject) => {
-        const { checkedCheckBoxId, current, total } = selectedCheckbox[projectObject.projectId];
+        const { checkedCheckBoxId, current, total } = selectedCheckbox[projectObject.projectId] || {};
 
         if (total && current > 0) {
             const { datas } = commandStore[projectObject.projectId];

@@ -221,13 +221,12 @@ function activate(context) {
               if (result) {
                 fullBackup();
                 allowUIReload(2); // logic wich allow two diffrent screen to alow new render not take cache
-
               }
               break;
             case 'createBulkCommands':
               const BulkedResult = createBulkCommand(commandStore, response, vscode);
               if (BulkedResult) {
-                //persistStore('persistedCommand', commandStore);
+
               }
               break;
             case "alert":
@@ -249,7 +248,7 @@ function activate(context) {
               break;
             case 'deleteActions':
               deleteActions(response, common, () => {
-                //persistStore('persistedCommand', commandStore);
+
                 fullBackup();
                 setCachedUI("home", HomePageUI(common));
                 loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
@@ -275,7 +274,7 @@ function activate(context) {
                   autoStartWorkspace: selected ? projectDirectory : false
                 }
               }
-              // isStartup = response.data || false;
+
               fullBackup({ KEY_STARTUP });
               setCachedUI("home", HomePageUI(common));
               vscode.window.showInformationMessage("Status Changed");
