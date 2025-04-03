@@ -191,7 +191,8 @@ function Resolve(toResolve = []) {
                   if (anycreated) {
                     vscode.postMessage({
                         callMethod: 'restartTerminal',
-                        data: result
+                        data: result,
+                        isFromResolveUi:true
                     });
                   }
                

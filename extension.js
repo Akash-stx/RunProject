@@ -224,9 +224,11 @@ function activate(context) {
               }
               break;
             case 'createBulkCommands':
-              const BulkedResult = createBulkCommand(commandStore, response, vscode);
+              const BulkedResult = createBulkCommand(response, common);
               if (BulkedResult) {
-
+                fullBackup();
+                setCachedUI("home", HomePageUI(common));
+                loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
               }
               break;
             case "alert":
@@ -240,10 +242,12 @@ function activate(context) {
               if (errorOnStart.length) {
                 panel.webview.html = reStartView(errorOnStart);
               }
-
               break;
             case 'restartTerminal':
               reStartTerminal(response, common);
+              if (response?.isFromResolveUi) {
+                loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
+              }
               //loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
               break;
             case 'deleteActions':

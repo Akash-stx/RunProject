@@ -21,7 +21,7 @@ function createNewCommand(response, common) {
         const projectId = common.count();
         const commandID = common.count();
 
-        const savedIndex = eachProjectLocator.push({
+        eachProjectLocator.push({
             projectId: projectId,
             projectName: projectName,
             projectNameSmallCase: projectName.toLowerCase(),
@@ -33,7 +33,6 @@ function createNewCommand(response, common) {
         mainCommandObject[projectId] = {
             projectId: projectId,
             projectName: projectName,
-            projectLocatIndex: savedIndex - 1,
             datas: {
                 [commandID]: { id: commandID, projectId, commandDescription: name, actualCommand: command }
             },
@@ -46,25 +45,84 @@ function createNewCommand(response, common) {
 
 }
 
-function createBulkCommand(commandStore, message, vscode) {
-    const { data: BulkarrayOfJsonData } = message || {};
-    const messageMKR = [false, false, 'Action created!', 'some', 'Actions skipped due to missing or duplicate names'];
-    BulkarrayOfJsonData?.forEach(({ name, command, checked = false } = {}) => {
-        if (name && command && !(name in commandStore)) {
-            commandStore[name] = {
-                id: name,
-                name: name,
-                command: command,
-                checked: checked,
+function createBulkCommand(response, common) {
+
+    const { data: BulkarrayOfJsonData } = response || {};
+    const eachProjectLocator = common.eachProjectLocator();//load all project name and its saved index on commandStore
+    const mainCommandObject = common.commandStore();
+    let anyProjectAdded = false;
+
+    Object.values(BulkarrayOfJsonData || {})?.forEach?.(({ projectName, datas } = {}) => {
+        if (!projectName) return;
+        const projectCommandData = Object.values(datas || {});
+        if (projectCommandData.length) {
+            !anyProjectAdded && (anyProjectAdded = true);
+            //search if it is present if it is then copy all refrence to the local variable
+            // if not present create new refrence and asisgined to the local with pass that to main objects
+
+            const currentProjectFromArray = eachProjectLocator.find((project) => project.projectName === projectName);
+
+            let projectLocaterRefrence;
+            let projectLocaterCommandRefrence;
+            let mainProjectRefrence;
+            let mainProjectCommandDataRefrence;
+            let currentProjectId;
+
+            if (currentProjectFromArray) {
+                currentProjectId = currentProjectFromArray.projectId;
+                mainProjectRefrence = mainCommandObject[currentProjectFromArray.projectId];
+                if (mainProjectRefrence) {
+                    projectLocaterCommandRefrence = currentProjectFromArray.children;
+                    mainProjectCommandDataRefrence = mainProjectRefrence.datas;
+                } else {
+
+                    mainProjectCommandDataRefrence = {};
+
+                    mainCommandObject[currentProjectFromArray.projectId] = {
+                        projectId: currentProjectFromArray.projectId,
+                        projectName: projectName,
+                        datas: mainProjectCommandDataRefrence,
+                    };
+
+                }
+
+            } else {
+                const projectId = common.count();
+                currentProjectId = projectId;
+                projectLocaterCommandRefrence = [];
+                projectLocaterRefrence = {
+                    projectId: projectId,
+                    projectName: projectName,
+                    projectNameSmallCase: projectName.toLowerCase(),
+                    searchBox: `'${projectName}'`,
+                    children: projectLocaterCommandRefrence
+                }
+                eachProjectLocator.push(projectLocaterRefrence);
+
+                mainProjectCommandDataRefrence = {};
+
+                mainCommandObject[projectId] = {
+                    projectId: projectId,
+                    projectName: projectName,
+                    datas: mainProjectCommandDataRefrence,
+                };
+
             }
 
-            messageMKR[0] = true;
-        } else {
-            messageMKR[1] = true;
+            projectCommandData.forEach(({ actualCommand, commandDescription } = {}) => {
+                const commandID = common.count();
+                projectLocaterCommandRefrence.push(commandID);
+                mainProjectCommandDataRefrence[commandID] = { id: commandID, projectId: currentProjectId, commandDescription: commandDescription, actualCommand: actualCommand };
+
+            });
+
         }
-    })
-    vscode.window.showInformationMessage(`${messageMKR[0] ? messageMKR[2] : ""} ${messageMKR[0] && messageMKR[1] ? messageMKR[3] : ""} ${messageMKR[1] ? messageMKR[4] : ""}`);
-    return messageMKR[0];
+
+    });
+
+
+    common.vscode.window.showInformationMessage(`${anyProjectAdded}?"Added!":"Not added! Please Ensure correct formate"`);
+    return anyProjectAdded;
 }
 
 
