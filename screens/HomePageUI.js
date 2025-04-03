@@ -207,8 +207,8 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
               .switch {
                 position: relative;
                 display: inline-block;
-                width: 40px;
-                height: 24px;
+                width: 30px;
+                height: 22px;
             }
 
             .switch input {
@@ -232,8 +232,8 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             .slider:before {
                 position: absolute;
                 content: "";
-                height: 18px;
-                width: 18px;
+                height: 16px;
+                width: 16px;
                 left: 3px;
                 bottom: 3px;
                 background-color: white;
@@ -246,7 +246,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             }
 
             input:checked + .slider:before {
-                transform: translateX(17px);
+                transform: translateX(8px);
             }
 
 
@@ -256,8 +256,9 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 border-width: medium;
                 border-style: solid;
                 position: relative;
-                left: -10px;
-                top: 8px;
+
+                left: -13px;
+                top: -10px;
             }
 
             .tooltip {
