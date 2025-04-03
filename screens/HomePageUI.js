@@ -1,4 +1,4 @@
-function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProjectLocator, getIsStartupSelected } = {}) {
+function HomePageUI({ commandStore, projectDirectory, fancyProjectName, checkBoxState, eachProjectLocator, getIsStartupSelected } = {}) {
 
 
     const actions = commandStore(); //load all data like project name and its comment like that
@@ -27,6 +27,11 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
 
             const state = checkedState[project.projectId];
 
+            const autoStart = state["autoStart"] || false;
+            const autoStartWorkspace = state["autoStartWorkspace"] || false;
+
+
+
             UICreator.checkBoxData.push(project.projectId);
             UICreator.checkBoxData.push(":");
 
@@ -47,16 +52,18 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 </label>`
             }).join('');
 
-            UICreator.checkBoxData.push(`{project:${project.projectId} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
+            UICreator.checkBoxData.push(`{project:${project.projectId} ,autoStart: ${autoStart}, autoStartWorkspace: ${autoStartWorkspace} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
 
             return `<div class="project" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
-           <div class="tooltip-container">
+           
+            <div class="tooltip-container">
             <label class="switch">
-                <input type="checkbox" id="startupToggle"  ${autostartEnabled ? "checked" : ""}>
+                <input type="checkbox" class="startupToggleOfproject" id="startupToggle" data-project="${project.projectId}" ${autoStart ? "checked" : ""}>
                 <span class="slider"></span>
             </label>
-            <span class="tooltip" id="tooltipText" > ${autostartEnabled ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
+            <span class="tooltip" id="tooltipText-${project.projectId}" > ${autoStart ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
            </div>
+
             <div class="project-header" style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">
                 <label id="projectHeader">
                   <input type="checkbox" id="${project.projectId}" class="project-checkbox" data-project="${project.projectId}" ${checkboxSize === howmanychecked ? "checked" : ""}>
@@ -310,24 +317,25 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
 
         <script>
             const vscode = acquireVsCodeApi();
+            const workspaceUrl= '${projectDirectory}';
             const stateOfCheckBOx=${UICreator.checkBoxData.join("")};
 
-            const toggle = document.getElementById("startupToggle");
-            const tooltipText = document.getElementById("tooltipText");
+            // const toggle = document.getElementById("startupToggle");
+            // const tooltipText = document.getElementById("tooltipText");
 
-            toggle.addEventListener("change", function() {
+            // toggle.addEventListener("change", function() {
             
-                vscode.postMessage({
-                        callMethod: 'allowStartup',
-                        data: this.checked
-                    });
+            //     vscode.postMessage({
+            //             callMethod: 'allowStartup',
+            //             data: this.checked
+            //         });
 
-                    if(this.checked){
-                     tooltipText.textContent ="Auto-Start: Enabled!";
-                    }else{
-                     tooltipText.textContent ="Auto-Start: Disabled";
-                    }
-            });
+            //         if(this.checked){
+            //          tooltipText.textContent ="Auto-Start: Enabled!";
+            //         }else{
+            //          tooltipText.textContent ="Auto-Start: Disabled";
+            //         }
+            // });
             
             
             document.getElementById('runButton').addEventListener('click', function() {
@@ -377,7 +385,30 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                         }
                      }
                      
+                }else if(target.classList.contains("startupToggleOfproject")){
+                 const projectID = target.dataset.project;
+                 console.log(projectID ,target.checked);
+
+
+                             
+                    vscode.postMessage({
+                        callMethod: 'allowStartup',
+                        data: {
+                         workspaceUrl,
+                         selected:target.checked,
+                         projectID
+                        }
+                    });
+
+                    const tooltipText = document.getElementById('tooltipText-'+projectID);
+
+                    if(target.checked){
+                     tooltipText.textContent ="Auto-Start: Enabled!";
+                    }else{
+                     tooltipText.textContent ="Auto-Start: Disabled";
+                    }
                 }
+
                     
             });
 

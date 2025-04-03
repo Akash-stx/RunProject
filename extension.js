@@ -151,6 +151,7 @@ function activate(context) {
     setCheckBoxState: (newState = {}) => {
       checkBoxState = newState;
     },
+    projectDirectory,
     setEachProjectLocator: (newRefrenceOfArray = []) => {
       eachProjectLocator = newRefrenceOfArray;
     },
