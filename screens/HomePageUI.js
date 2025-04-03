@@ -48,6 +48,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             }).join('');
 
             UICreator.checkBoxData.push(`{project:${project.projectId} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
+
             return `<div class="project" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
             <div class="project-header" style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">
                 <label id="projectHeader">
@@ -55,9 +56,19 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                   ${project.projectName}
                 </label>
             </div>
-            <div class="commands" style="margin-left: 20px;">
+             
+            <div class="commands" style="margin-left: 20px;margin-bottom: 10px;">
                 ${innerCheckBox}
             </div>
+
+           <div class="tooltip-container">
+            <label class="switch">
+                <input type="checkbox" id="startupToggle"  ${autostartEnabled ? "checked" : ""}>
+                <span class="slider"></span>
+            </label>
+            <span class="tooltip" id="tooltipText" > ${autostartEnabled ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
+           </div>
+           
         </div>`
         }).join('')
         : "<p id='noActionPresent'>Looks empty! Click 'Add' to create one.</p>";
@@ -195,7 +206,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
               .switch {
                 position: relative;
                 display: inline-block;
-                width: 50px;
+                width: 40px;
                 height: 24px;
             }
 
@@ -213,7 +224,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 right: 0;
                 bottom: 0;
                 background-color: #ccc;
-                transition: .4s;
+                transition: .2s;
                 border-radius: 24px;
             }
 
@@ -225,24 +236,27 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 left: 3px;
                 bottom: 3px;
                 background-color: white;
-                transition: .4s;
+                transition: .2s;
                 border-radius: 50%;
             }
 
             input:checked + .slider {
-                background-color: #4CAF50;
+                background-color: #4a90e2;
             }
 
             input:checked + .slider:before {
-                transform: translateX(26px);
+                transform: translateX(17px);
             }
 
 
             .tooltip-container {
-                padding-left: 10px;
                 border: #fafaf8;
+                padding-left: 7px;
                 border-width: medium;
                 border-style: solid;
+                position: relative;
+                left: 8px;
+                top: 8px;
             }
 
             .tooltip {
@@ -282,6 +296,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
         <textarea id="exportData">${toExport}</textarea>
          
         <div id="actionsContainer">${checkboxesHtml}</div>
+
         <div class="button-container">
             <button id="runButton">Run Selected</button>
             <button id="restartButton">Restart Selected</button>
@@ -289,16 +304,6 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             <button id="deleteButton">Delete Selected</button>
             <button id="exportButton">Copy as JSON</button>
             <button id="createNewAction">Add</button>
-            
-           <div class="tooltip-container">
-            <label class="switch">
-                <input type="checkbox" id="startupToggle"  ${autostartEnabled ? "checked" : ""}>
-                <span class="slider"></span>
-            </label>
-            <span class="tooltip" id="tooltipText" > ${autostartEnabled ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
-            </div>
-            
-            
         </div>
 
         <script>
