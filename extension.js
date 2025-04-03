@@ -49,7 +49,7 @@ function getProjectRoot() {
  */
 let CurrentContextVscode;
 
-let isStartup = false;
+let isStartup = {};
 let commandStore = {};
 let checkBoxState = {};
 let eachProjectLocator = [];
@@ -74,7 +74,7 @@ function init(context) {
   checkBoxState = context.globalState.get(KEY_STATE) || {};
   eachProjectLocator = context.globalState.get(KEY_PROJECTS) || [];
   count = context.globalState.get(KEY_NUMBER) || 0;
-  isStartup = context.globalState.get(KEY_STARTUP) || false;
+  isStartup = context.globalState.get(KEY_STARTUP) || {};
 }
 
 function fullBackup({ KEY_COMMANDS: c, KEY_STATE: k, KEY_PROJECTS: p, KEY_NUMBER: n, KEY_STARTUP: t, all } = { all: true, KEY_COMMANDS, KEY_STATE, KEY_PROJECTS, KEY_NUMBER, KEY_STARTUP }) {
@@ -146,7 +146,7 @@ function activate(context) {
   let panel;
 
   const common = {
-    getIsStartupSelected: () => isStartup,
+    getStartup: () => isStartup,
     checkBoxState: () => checkBoxState,
     setCheckBoxState: (newState = {}) => {
       checkBoxState = newState;
@@ -259,10 +259,27 @@ function activate(context) {
               stopTerminal(response, common);
               break;
             case 'allowStartup':
-              vscode.window.showInformationMessage(`Project root: ${projectDirectory}`);
-              isStartup = response.data || false;
+              const {
+                projectID,
+                selected } = response.data || {};
+
+
+              const getStartup = common.getStartup();
+              const statePresent = getStartup[projectID];
+
+              if (statePresent) {
+                statePresent.autoStart = selected;
+                statePresent.autoStartWorkspace = selected ? projectDirectory : false
+              } else {
+                getStartup[projectID] = {
+                  autoStart: selected,
+                  autoStartWorkspace: selected ? projectDirectory : false
+                }
+              }
+              // isStartup = response.data || false;
               fullBackup({ KEY_STARTUP });
-              //vscode.window.showInformationMessage("Status Changed");
+              setCachedUI("home", HomePageUI(common));
+              vscode.window.showInformationMessage("Status Changed");
               break;
 
           }
@@ -290,9 +307,9 @@ function activate(context) {
   context.subscriptions.push(Screen);
   context.subscriptions.push(statusBarIcon);
 
-  if (isStartup) {
-    startTerminal({ data: common.checkBoxState() }, common);
-  }
+
+  //startTerminal({ data: common.checkBoxState() }, common);
+
 }
 
 // This method is called when your extension is deactivated

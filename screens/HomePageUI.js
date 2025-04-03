@@ -1,11 +1,11 @@
-function HomePageUI({ commandStore, projectDirectory, fancyProjectName, checkBoxState, eachProjectLocator, getIsStartupSelected } = {}) {
+function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProjectLocator, getStartup } = {}) {
 
 
     const actions = commandStore(); //load all data like project name and its comment like that
     const checkedState = checkBoxState(); // load the data like wich is checkbox seleected wich is not
     const projectLocater = eachProjectLocator();
 
-    const autostartEnabled = getIsStartupSelected();
+    const startupData = getStartup();
 
     const toExport = JSON.stringify(actions);
 
@@ -27,9 +27,7 @@ function HomePageUI({ commandStore, projectDirectory, fancyProjectName, checkBox
 
             const state = checkedState[project.projectId];
 
-            const autoStart = state["autoStart"] || false;
-            const autoStartWorkspace = state["autoStartWorkspace"] || false;
-
+            const autoStart = startupData?.[project.projectId]?.["autoStart"] || false;
 
 
             UICreator.checkBoxData.push(project.projectId);
@@ -40,7 +38,7 @@ function HomePageUI({ commandStore, projectDirectory, fancyProjectName, checkBox
             let collectSelectedCheckBoxId = [];
 
             const innerCheckBox = checkbox.map((command) => {
-                const isChecked = state?.checkedCheckBoxId[command.id];
+                const isChecked = state?.checkedCheckBoxId?.[command.id]; //map 
                 if (isChecked) {
                     collectSelectedCheckBoxId.push(`${command.id}:true`);
                     howmanychecked++;
@@ -52,7 +50,7 @@ function HomePageUI({ commandStore, projectDirectory, fancyProjectName, checkBox
                 </label>`
             }).join('');
 
-            UICreator.checkBoxData.push(`{project:${project.projectId} ,autoStart: ${autoStart}, autoStartWorkspace: ${autoStartWorkspace} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
+            UICreator.checkBoxData.push(`{project:${project.projectId} , autoStart: ${autoStart} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
 
             return `<div class="project" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
            
@@ -317,7 +315,6 @@ function HomePageUI({ commandStore, projectDirectory, fancyProjectName, checkBox
 
         <script>
             const vscode = acquireVsCodeApi();
-            const workspaceUrl= '${projectDirectory}';
             const stateOfCheckBOx=${UICreator.checkBoxData.join("")};
 
             // const toggle = document.getElementById("startupToggle");
@@ -394,7 +391,6 @@ function HomePageUI({ commandStore, projectDirectory, fancyProjectName, checkBox
                     vscode.postMessage({
                         callMethod: 'allowStartup',
                         data: {
-                         workspaceUrl,
                          selected:target.checked,
                          projectID
                         }

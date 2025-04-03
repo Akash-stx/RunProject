@@ -118,11 +118,11 @@ function startTerminal(response, common) {
 
     Object.values(stateOfCheckBOx || {}).forEach(
         ({ checkedCheckBoxId, project: projectId, current: currentSelected } = {}) => {
-            if (currentSelected < 1) {
+            if (currentSelected < 1 || !currentSelected) {
                 return;
             }
             const projectObject = commandStore[projectId];
-            Object.entries(checkedCheckBoxId)?.forEach(([keys, value]) => {
+            Object.entries(checkedCheckBoxId || {})?.forEach(([keys, value]) => {
                 if (value) {
                     const data = projectObject?.datas?.[keys];
                     if (data) {
