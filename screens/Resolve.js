@@ -122,7 +122,7 @@ function Resolve(toResolve = []) {
              color: black;
             }
              #checkboxes  {
-                margin-top: 85px;
+                margin-top: 135px;
             }
 
             #nameOfProject {

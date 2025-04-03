@@ -121,7 +121,9 @@ function createBulkCommand(response, common) {
     });
 
 
-    common.vscode.window.showInformationMessage(`${anyProjectAdded}?"Added!":"Not added! Please Ensure correct formate"`);
+    common.vscode.window.showInformationMessage(
+        anyProjectAdded ? "Project added successfully!" : "Project not added! Please ensure the correct format."
+    );
     return anyProjectAdded;
 }
 

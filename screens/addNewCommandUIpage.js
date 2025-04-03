@@ -110,7 +110,18 @@ function addNewCommandUIpage({ eachProjectLocator } = {}) {
             <input type="text" id="command" placeholder="Enter the command" required>
             
             <label for="bulkData" id="bulkDataLabel">Bulk JSON Input:</label>
-            <textarea id="bulkData"  placeholder='Enter JSON format: \n[{"name": "name1", "command": "command1"}, \n{"name": "name2", "command": "command2"}]\n No duplicate Name'>[{ "name": "name1","command": "command1"}]</textarea>
+            <textarea id="bulkData"  placeholder='Enter JSON format: \n[{"name": "name1", "command": "command1"}, \n{"name": "name2", "command": "command2"}]\n No duplicate Name'>
+{
+    "id": {
+        "datas": {
+            "188": {
+                "actualCommand": "example start",
+                "commandDescription": "example"
+            }
+        },
+        "projectName": "ve project"
+    }
+}</textarea>
             
             <button id="submit">Submit</button>
             <button id="viewActionList">Go to Action List</button>
