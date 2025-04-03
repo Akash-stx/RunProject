@@ -144,6 +144,39 @@ function startTerminal(response, common) {
     return commandThatCannotAbleToStart;
 }
 
+function starupLogic(common) {
+    const eachProjectLocator = common.eachProjectLocator();
+    const commandStore = common.commandStore();
+    const startupDatas = common.getStartup();
+    const checkBoxState = common.checkBoxState();
+
+
+    eachProjectLocator?.forEach?.((projectObject) => {
+        const { autoStart, autoStartWorkspace } = startupDatas?.[projectObject.projectId] || {};
+        let checkBoxStateMap;
+        if (autoStart && common.projectDirectory === autoStartWorkspace && (checkBoxStateMap = checkBoxState[projectObject.projectId])) {
+            const { checkedCheckBoxId, current, total } = checkBoxStateMap;
+            if (total && current > 0) {
+                const { datas } = commandStore[projectObject.projectId];
+                let allowedLoopAfter = current;
+                const totallen = projectObject?.children?.length || 0;
+
+                for (let index = 0; index < totallen; index++) {
+                    const id = projectObject.children[index]; // array of chilren id 
+                    if (checkedCheckBoxId[id]) { // checking that id in this map gives true if present
+                        createNewTerminal(datas[id], common);
+                        allowedLoopAfter--;
+                        if (allowedLoopAfter === 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+    });
+}
+
 function reStartTerminal(response, common) {
     const { data: selectedCheckbox } = response;
     const eachProjectLocator = common.eachProjectLocator();
@@ -263,5 +296,5 @@ module.exports = {
     createNewCommand,
     startTerminal,
     deleteActions, createBulkCommand,
-    reStartTerminal, stopTerminal, createNewTerminal
+    reStartTerminal, stopTerminal, createNewTerminal, starupLogic
 }

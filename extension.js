@@ -1,5 +1,5 @@
 const addNewCommandUIpage = require("./screens/addNewCommandUIpage");
-const { createNewCommand, createNewTerminal, startTerminal, deleteActions, createBulkCommand, reStartTerminal, stopTerminal } = require("./functionality");
+const { createNewCommand, createNewTerminal, starupLogic, startTerminal, deleteActions, createBulkCommand, reStartTerminal, stopTerminal } = require("./functionality");
 const HomePageUI = require("./screens/HomePageUI");
 const reStartView = require("./screens/Resolve");
 const vscode = require("vscode");
@@ -266,7 +266,6 @@ function activate(context) {
 
               const getStartup = common.getStartup();
               const statePresent = getStartup[projectID];
-
               if (statePresent) {
                 statePresent.autoStart = selected;
                 statePresent.autoStartWorkspace = selected ? projectDirectory : false
@@ -306,6 +305,8 @@ function activate(context) {
 
   context.subscriptions.push(Screen);
   context.subscriptions.push(statusBarIcon);
+
+  starupLogic(common);
 
 
   //startTerminal({ data: common.checkBoxState() }, common);
