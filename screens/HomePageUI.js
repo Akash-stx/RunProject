@@ -54,13 +54,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
 
             return `<div class="project" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
            
-            <div class="tooltip-container">
-            <label class="switch">
-                <input type="checkbox" class="startupToggleOfproject" id="startupToggle" data-project="${project.projectId}" ${autoStart ? "checked" : ""}>
-                <span class="slider"></span>
-            </label>
-            <span class="tooltip" id="tooltipText-${project.projectId}" > ${autoStart ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
-           </div>
+            
 
             <div class="project-header" style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">
                 <label id="projectHeader">
@@ -72,7 +66,16 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             <div class="commands" style="margin-left: 24px;margin-bottom: 8px;margin-top: 12px;">
                 ${innerCheckBox}
             </div>
-
+            <div class="tooltip-container">
+            <label class="switch">
+                <input type="checkbox" class="startupToggleOfproject" id="startupToggle" data-project="${project.projectId}" ${autoStart ? "checked" : ""}>
+                <span class="slider"></span>
+            </label>
+            <span class="tooltip" id="tooltipText-${project.projectId}" > ${autoStart ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}
+               
+            </span>
+             <small id="autorunsuggession">| (Turn on Auto-Start for this project when you open its workspace.)</small>
+           </div>
            
            
         </div>`
@@ -99,6 +102,11 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                     align-items: center;
                     height: 100vh;
                     overflow: hidden; /* Prevents entire page from scrolling */
+            }
+            #autorunsuggession{
+                            position: relative;
+                color: darkblue;
+                top: 2px;
             }
             
             #actionsContainer {
@@ -247,7 +255,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             }
 
             input:checked + .slider {
-                background-color: #4a90e2;
+                background-color: #b8383d;
             }
 
             input:checked + .slider:before {
@@ -261,9 +269,8 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 border-width: medium;
                 border-style: solid;
                 position: relative;
-
                 left: -13px;
-                top: -10px;
+                top: 7px; 
             }
 
             .tooltip {
