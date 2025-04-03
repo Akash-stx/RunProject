@@ -1,28 +1,46 @@
-# Custom Code Import & Suggestion Helper
+# LaunchBoard 🚀  
 
-## Overview
+A **VS Code extension** to run project-specific commands fast with a clean UI.
 
-A VS Code extension that enhances coding efficiency by providing contextual code suggestions and automatic import management.
+## Features  
+- ✅ **Run Commands** - Execute project commands without opening a terminal.  
+- 🔄 **Auto-Start Projects** - Launch projects automatically in their workspace.  
+- 📌 **Manage Multiple Projects** - Enable/disable auto-start per project.  
+- 📤 **JSON Export/Import** - Share & import project settings easily.  
+- ⚡ **One-Click Execution** - Start, stop, or restart commands instantly.  
 
-## Features
+## Installation  
+1. Open **VS Code**.  
+2. Go to **Extensions** (`Ctrl + Shift + X`).  
+3. Search for **LaunchBoard** and click **Install**.
 
-- **Insert Imports for Selected Components**: Quickly add imports for selected components or functions directly into your file.
-- **Context-Based Suggestions**: Trigger `Ctrl + Space` for intelligent import suggestions based on your cursor’s current context.
+## How to Use  
+### 1️⃣ Add Projects  
+- Click **"Add"** to register a project.  
+- Assign commands to run in that project.  
 
-## Commands
+### 2️⃣ Auto-Start Projects  
+- Toggle **Auto-Start** to launch projects automatically.  
+- Saves the current directory for accurate execution.  
 
-- **Keyboard Shortcuts**:
-  - `Ctrl + Shift + L` - Save selected imports to be reused across your project.
-  - `Ctrl + Space` - Show context-based import suggestions, including previously saved imports for quicker access.
+### 3️⃣ Run & Manage Commands  
+- **Run** - Start selected commands.  
+- **Restart** - Restart selected commands.  
+- **Stop** - Stop running commands.  
+- **Delete** - Remove projects from the list.  
 
-## Installation
+### 4️⃣ Export & Import Configurations  
+- Use **"Copy as JSON"** to export settings.  
+- Share JSON files to import configurations easily.  
 
-1. Open _Visual Studio Code_.
-2. Go to the _Extensions_ view by clicking on the Extensions icon in the Activity Bar or pressing `Ctrl + Shift + X`.
-3. Search for "**LaunchBoard**" and click _Install_.
+## Screenshot  
+![LaunchBoard UI](assets/screenshot.png)  
 
-## Usage
+## Why JSON Export?  
+Easily share and import project configurations across teams. **Export settings**, share with others, and **import instantly** for consistency.
 
-1. **Trigger Import Suggestions**: Place your cursor where you'd like an import suggestion and press `Ctrl + Space` to see a list of relevant imports.
-2. **Add Multiple Imports**: Select and add multiple imports at once by using `Ctrl + Shift + L`.
-3. **Prevent Duplicate Imports**: The extension will automatically merge imports from the same module into a single import statement if they already exist in the file.
+## Open LaunchBoard  
+Click the **LaunchBoard icon** in the sidebar to open the extension.
+
+## License  
+MIT License
