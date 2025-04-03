@@ -50,6 +50,13 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             UICreator.checkBoxData.push(`{project:${project.projectId} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
 
             return `<div class="project" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+           <div class="tooltip-container">
+            <label class="switch">
+                <input type="checkbox" id="startupToggle"  ${autostartEnabled ? "checked" : ""}>
+                <span class="slider"></span>
+            </label>
+            <span class="tooltip" id="tooltipText" > ${autostartEnabled ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
+           </div>
             <div class="project-header" style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">
                 <label id="projectHeader">
                   <input type="checkbox" id="${project.projectId}" class="project-checkbox" data-project="${project.projectId}" ${checkboxSize === howmanychecked ? "checked" : ""}>
@@ -61,13 +68,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 ${innerCheckBox}
             </div>
 
-           <div class="tooltip-container">
-            <label class="switch">
-                <input type="checkbox" id="startupToggle"  ${autostartEnabled ? "checked" : ""}>
-                <span class="slider"></span>
-            </label>
-            <span class="tooltip" id="tooltipText" > ${autostartEnabled ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
-           </div>
+           
            
         </div>`
         }).join('')
