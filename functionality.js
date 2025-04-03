@@ -194,12 +194,10 @@ function reStartTerminal(response, common) {
             const { datas } = commandStore[projectObject.projectId];
             projectObject?.children?.forEach((id) => {
                 const { terminal } = activeTerminals[id] || {}
-                if (checkedCheckBoxId[id] && terminal) {
-                    terminal.dispose();
+                if (checkedCheckBoxId[id]) {
+                    terminal && terminal.dispose();
                     delete activeTerminals[id];
                     TERMINAL_IdMap.delete(terminal);
-                    createNewTerminal(datas[id], common);
-                } else {
                     createNewTerminal(datas[id], common);
                 }
 
