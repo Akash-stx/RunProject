@@ -33,6 +33,15 @@ function getIcon(context) {
 }
 
 
+function getProjectRoot() {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (workspaceFolders && workspaceFolders.length > 0) {
+    return workspaceFolders[0].uri.fsPath; // This is the stable project directory
+  }
+  return null; // No workspace open
+}
+
+
 
 
 /***
@@ -48,6 +57,7 @@ let count = 0;
 const activeTerminals = {};
 const TERMINAL_IdMap = new Map(); // used map here to store terminal refrence as key
 const cacheUI = {};
+let projectDirectory;
 
 let reloadUI = 0;
 let UiReloadedBy = {};
@@ -105,6 +115,7 @@ function setCachedUI(cacheKey, cachedUI) {
  */
 function activate(context) {
   CurrentContextVscode = context;
+  projectDirectory = getProjectRoot();
   /**
    * initializations
    */ init(context);
@@ -247,6 +258,7 @@ function activate(context) {
               stopTerminal(response, common);
               break;
             case 'allowStartup':
+              vscode.window.showInformationMessage(`Project root: ${projectDirectory}`);
               isStartup = response.data || false;
               fullBackup({ KEY_STARTUP });
               //vscode.window.showInformationMessage("Status Changed");
