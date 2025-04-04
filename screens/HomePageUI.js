@@ -62,9 +62,9 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
 
             return `<div class="project">
            
-               <div class="project-header  ${isThisProjectDirectory ? 'locked' : ''}" id="project-header-${project.projectId}">
+               <div class="project-header  ${isThisProjectDirectory ? '' : 'locked'}" id="ph-${project.projectId}">
                 
-                <span class="${true ? "mark-workspace" : ""}">Current Workspace</span>
+                     <span class="${isThisProjectDirectory ? "mark-workspace" : "not-mark-workspace"}" id="mw-${project.projectId}" >Current Workspace</span>
         
                     <label id="projectHeader">
                     <input type="checkbox" style="cursor: grab;" id="${project.projectId}" class="project-checkbox" data-project="${project.projectId}" ${checkboxSize === howmanychecked ? "checked" : ""}>
@@ -73,11 +73,12 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
 
                 </div>
                 
-                <div class="commands ${isThisProjectDirectory ? 'locked' : ''}" id="project-commands-${project.projectId}" >
+                <div class="commands ${isThisProjectDirectory ? '' : 'locked'}" id="pc-${project.projectId}" >
                     ${innerCheckBox}
                 </div>
             
                 <!-- Drop Icon Button -->
+
                 <button
                     class="toggle-details-btn" id="toggle-details-btn-id"
                     data-project="${project.projectId}" 
@@ -87,6 +88,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
 
            
                 <!-- Collapsible Content -->
+
                 <div class="Collapsible" id="collapse-${project.projectId}" data-project="${project.projectId}" style="display: none; margin-top: 10px;">
                     
                     <div class="tooltip-container">
@@ -98,7 +100,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
                     </div>
                     
 
-                  <div class="noninteractive ${isThisProjectDirectory ? 'locked' : ''}" id="project-noninteractive-${project.projectId}">
+                  <div class="noninteractive ${isThisProjectDirectory ? '' : 'locked'}" id="pn-${project.projectId}">
  
                     <div class="tooltip-container">
                         <label class="switch">
@@ -239,6 +241,33 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
                 }else if(target.classList.contains("tooglerSetDirectory")){
                    const projectID = target.dataset.project;
                    console.log(projectID ,target.checked);
+
+                   const projectHeadingDiv = document.getElementById('ph-'+projectID);
+                   const markWorkspaceSpan = document.getElementById('mw-'+projectID);
+                   const projectCommandDiv = document.getElementById('pc-'+projectID);
+                   const projectNonInteractiveDiv = document.getElementById('pn-'+projectID);
+
+
+                   if(target.checked){
+                     projectHeadingDiv.classList.remove('locked');
+                     projectCommandDiv.classList.remove('locked');
+                     projectNonInteractiveDiv.classList.remove('locked');
+                     markWorkspaceSpan.classList.remove('not-mark-workspace');
+                     markWorkspaceSpan.classList.add('mark-workspace');
+                    
+                   }else{
+
+                     projectHeadingDiv.classList.add('locked');
+                     projectCommandDiv.classList.add('locked');
+                     projectNonInteractiveDiv.classList.add('locked');
+                     markWorkspaceSpan.classList.remove('mark-workspace');
+                     markWorkspaceSpan.classList.add('not-mark-workspace');
+                    
+                   }
+
+
+                   // Remove 'locked', add 'unlocked'
+
                 
                 }
 

@@ -37,6 +37,7 @@ function Resolve(toResolve = []) {
                     color: #333;
                     padding: 10px;
                 }
+                    
             .parent {
                 margin-bottom: 20px;
                 padding: 10px;
