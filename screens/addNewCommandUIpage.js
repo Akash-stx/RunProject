@@ -100,14 +100,14 @@ function addNewCommandUIpage({ eachProjectLocator } = {}) {
         <div class="container">
             <h1 id="headerr">Add New Command</h1>
             <label><input type="checkbox" id="bulkToggle"> Enable Bulk Entry</label>
-            <label for="searchBox">Project Name:</label>
-            <input type="text" id="searchBox" placeholder="Enter the Project Name" required>
+            <label for="searchBox">Project Name</label>
+            <input type="text" id="searchBox" placeholder="e.g. MyApp, PortfolioSite, API-Server" required>
             <ul id="suggestionsBox" ></ul>
-            <label for="name">Command Title:</label>
-            <input type="text" id="name" placeholder="Enter the Command Title" required>
+            <label for="name">Command Title</label>
+            <input type="text" id="name" placeholder="e.g. Start Dev Server" required>
             
-            <label for="command">Command:</label>
-            <input type="text" id="command" placeholder="Enter the command" required>
+            <label for="command">Command</label>
+            <input type="text" id="command" placeholder="e.g. npm install ; npm run dev" required>
             
             <label for="bulkData" id="bulkDataLabel">Bulk JSON Input:</label>
             <textarea id="bulkData"  placeholder='Enter JSON format: \n[{"name": "name1", "command": "command1"}, \n{"name": "name2", "command": "command2"}]\n No duplicate Name'>

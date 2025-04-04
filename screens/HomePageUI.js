@@ -102,9 +102,13 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                     align-items: center;
                     height: 100vh;
                     overflow: hidden; /* Prevents entire page from scrolling */
+                    padding: 10px;
+                    scrollbar-color: #6d7c77 #cfd7c7;
             }
+
+
             #autorunsuggession{
-                            position: relative;
+                position: relative;
                 color: darkblue;
                 top: 2px;
             }

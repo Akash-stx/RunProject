@@ -30,6 +30,8 @@ function Resolve(toResolve = []) {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
+                    padding: 10px;
+                    scrollbar-color: #6d7c77 #cfd7c7;
             }
                 h1 {
                     color: #333;
@@ -127,12 +129,12 @@ function Resolve(toResolve = []) {
 
             #nameOfProject {
                     position: fixed;
-                    top: -13px;
+                    top: -22px;
                     width: 100%;
                     background: white;
                     text-align: center;
                     padding: 10px 0;
-                    font-size: 29px;
+                    font-size: 32px;
                     font-weight: 600;
                     color: #4a90e2;
                     border-bottom: 2px solid black;
