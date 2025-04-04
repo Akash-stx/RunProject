@@ -45,7 +45,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 }
 
                 return `<label class="command-item" style="display: block; margin-top: 5px;">
-                    <input type="checkbox" class="command-checkbox" data-project="${project.projectId}" data-id="${command.id}" id="${command.id}" ${isChecked ? "checked" : ""}>
+                    <input type="checkbox" style="cursor: grab;" class="command-checkbox" data-project="${project.projectId}" data-id="${command.id}" id="${command.id}" ${isChecked ? "checked" : ""}>
                     ${command.commandDescription} (${command.actualCommand})
                 </label>`
             }).join('');
@@ -57,8 +57,11 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             
 
             <div class="project-header" style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">
+                
+            <span class="${true ? "mark-workspace" : "not-mark-workspace"} ">Current Workspace</span>
+    
                 <label id="projectHeader">
-                  <input type="checkbox" id="${project.projectId}" class="project-checkbox" data-project="${project.projectId}" ${checkboxSize === howmanychecked ? "checked" : ""}>
+                  <input type="checkbox" style="cursor: grab;" id="${project.projectId}" class="project-checkbox" data-project="${project.projectId}" ${checkboxSize === howmanychecked ? "checked" : ""}>
                   ${project.projectName}
                 </label>
             </div>
@@ -66,18 +69,40 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             <div class="commands" style="margin-left: 24px;margin-bottom: 8px;margin-top: 12px;">
                 ${innerCheckBox}
             </div>
-            <div class="tooltip-container">
-            <label class="switch">
-                <input type="checkbox" class="startupToggleOfproject" id="startupToggle" data-project="${project.projectId}" ${autoStart ? "checked" : ""}>
-                <span class="slider"></span>
-            </label>
-            <span class="tooltip" id="tooltipText-${project.projectId}" > ${autoStart ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}
-               
-            </span>
-             <small id="autorunsuggession">| (Turn on Auto-Start for this project when you open its workspace.)</small>
-           </div>
+            
+            <!-- Drop Icon Button -->
+            <button
+                class="toggle-details-btn" id="toggle-details-btn-id"
+                data-project="${project.projectId}" 
+                style="background: none; border: none;  cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                <span class="toggle-icon">▼</span> <span>Settings</span>
+            </button>
+
            
-           
+             <!-- Collapsible Content -->
+            <div id="collapse-${project.projectId}" data-project="${project.projectId}" style="display: none; margin-top: 10px;">
+
+                <div class="tooltip-container">
+                    <label class="switch">
+                        <input type="checkbox" style="cursor: grab;" class="startupToggleOfproject" data-project="${project.projectId}" ${autoStart ? "checked" : ""}>
+                        <span class="slider"></span>
+                    </label>
+                    <span class="tooltip">${autoStart ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
+                    <small>| (Turn on Auto-Start for this project when you open its workspace.)</small>
+                </div>
+
+                <small style="display: block; margin-top: 8px; color: #555;">
+                📁 <strong>Workspace Binding:</strong>
+                <button
+                    class="bind-workspace-btn"
+                    data-project="${project.projectId}"
+                    style="background: none; border: none; color: #007acc; cursor: pointer; padding: 0;">
+                    Mark this current workspace for this project
+                </button>
+                </small>
+
+
+            </div>
         </div>`
         }).join('')
         : "<p id='noActionPresent'>Looks empty! Click 'Add' to create one.</p>";
@@ -104,6 +129,30 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                     overflow: hidden; /* Prevents entire page from scrolling */
                     padding: 10px;
                     scrollbar-color: #6d7c77 #cfd7c7;
+            }
+
+            .mark-workspace{
+                font-size: 10px;
+                padding: 2px 6px;
+                background: #dfc215;
+                color: #555151;
+                border-radius: 4px;
+                position: relative;
+                top: -7px;
+                cursor: default;
+            }
+
+            .not-mark-workspace{
+             padding: 2px 6px;
+             opacity: 0;
+            }
+            
+            #toggle-details-btn-id{
+                position: relative;
+                left: -13px;
+                font-size: 11px;
+                color: #87457d;
+                    top: 5px;
             }
 
 
@@ -221,7 +270,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 transition: background-color 0.3s, transform 0.2s;
             }
 
-              .switch {
+            .switch {
                 position: relative;
                 display: inline-block;
                 width: 30px;
@@ -353,6 +402,23 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                         data: stateOfCheckBOx
                     });
                 
+            });
+
+
+
+            document.querySelectorAll(".toggle-details-btn").forEach(button => {
+            button.addEventListener("click", () => {
+                const projectId = button.getAttribute("data-project");
+                const details = document.getElementById('collapse-'+projectId);
+
+                const icon = button.querySelector(".toggle-icon");
+
+                if (details) {
+                const isOpen = details.style.display === "block";
+                details.style.display = isOpen ? "none" : "block";
+                 if (icon) icon.textContent = isOpen ? "▼" : "▲";
+                }
+            });
             });
 
 
