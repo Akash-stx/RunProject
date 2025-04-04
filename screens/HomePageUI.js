@@ -1,8 +1,13 @@
-function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProjectLocator, getStartup } = {}) {
+const innerCss = require("./homePageCss");
+
+function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
+    eachProjectLocator, getStartup, projectDirectory } = {}) {
 
 
-    const actions = commandStore(); //load all data like project name and its comment like that
-    const checkedState = checkBoxState(); // load the data like wich is checkbox seleected wich is not
+    //load all data like project name and its comment like that
+    const actions = commandStore();
+    // load the data like wich is checkbox seleected wich is not
+    const checkedState = checkBoxState();
     const projectLocater = eachProjectLocator();
 
     const startupData = getStartup();
@@ -24,6 +29,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                 return "";
             }
 
+            const isThisProjectDirectory = projectDirectory === project["directory"];
 
             const state = checkedState[project.projectId];
 
@@ -44,65 +50,71 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                     howmanychecked++;
                 }
 
-                return `<label class="command-item" style="display: block; margin-top: 5px;">
+                return `<label class="command-item">
+
                     <input type="checkbox" style="cursor: grab;" class="command-checkbox" data-project="${project.projectId}" data-id="${command.id}" id="${command.id}" ${isChecked ? "checked" : ""}>
                     ${command.commandDescription} (${command.actualCommand})
+
                 </label>`
             }).join('');
 
             UICreator.checkBoxData.push(`{project:${project.projectId} , autoStart: ${autoStart} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
 
-            return `<div class="project" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+            return `<div class="project">
            
-            
-
-            <div class="project-header" style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">
+               <div class="project-header  ${isThisProjectDirectory ? 'locked' : ''}" id="project-header-${project.projectId}">
                 
-            <span class="${true ? "mark-workspace" : "not-mark-workspace"} ">Current Workspace</span>
-    
-                <label id="projectHeader">
-                  <input type="checkbox" style="cursor: grab;" id="${project.projectId}" class="project-checkbox" data-project="${project.projectId}" ${checkboxSize === howmanychecked ? "checked" : ""}>
-                  ${project.projectName}
-                </label>
-            </div>
-             
-            <div class="commands" style="margin-left: 24px;margin-bottom: 8px;margin-top: 12px;">
-                ${innerCheckBox}
-            </div>
+                <span class="${true ? "mark-workspace" : ""}">Current Workspace</span>
+        
+                    <label id="projectHeader">
+                    <input type="checkbox" style="cursor: grab;" id="${project.projectId}" class="project-checkbox" data-project="${project.projectId}" ${checkboxSize === howmanychecked ? "checked" : ""}>
+                    ${project.projectName}
+                    </label>
+
+                </div>
+                
+                <div class="commands ${isThisProjectDirectory ? 'locked' : ''}" id="project-commands-${project.projectId}" >
+                    ${innerCheckBox}
+                </div>
             
-            <!-- Drop Icon Button -->
-            <button
-                class="toggle-details-btn" id="toggle-details-btn-id"
-                data-project="${project.projectId}" 
-                style="background: none; border: none;  cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                <span class="toggle-icon">▼</span> <span>Settings</span>
-            </button>
+                <!-- Drop Icon Button -->
+                <button
+                    class="toggle-details-btn" id="toggle-details-btn-id"
+                    data-project="${project.projectId}" 
+                    style="background: none; border: none;  cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    <span class="toggle-icon">▼</span> <span>Settings</span>
+                </button>
 
            
-             <!-- Collapsible Content -->
-            <div id="collapse-${project.projectId}" data-project="${project.projectId}" style="display: none; margin-top: 10px;">
+                <!-- Collapsible Content -->
+                <div class="Collapsible" id="collapse-${project.projectId}" data-project="${project.projectId}" style="display: none; margin-top: 10px;">
+                    
+                    <div class="tooltip-container">
+                        <label class="switch">
+                            <input type="checkbox" style="cursor: grab;" class="tooglerSetDirectory" data-project="${project.projectId}" ${isThisProjectDirectory ? "checked" : ""}>
+                            <span class="slider"></span>
+                        </label>
+                        <small class="toolTipHint">| (Turn on Auto-Start for this project when you open its workspace.)</small>
+                    </div>
+                    
 
-                <div class="tooltip-container">
-                    <label class="switch">
-                        <input type="checkbox" style="cursor: grab;" class="startupToggleOfproject" data-project="${project.projectId}" ${autoStart ? "checked" : ""}>
-                        <span class="slider"></span>
-                    </label>
-                    <span class="tooltip">${autoStart ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
-                    <small>| (Turn on Auto-Start for this project when you open its workspace.)</small>
+                  <div class="noninteractive ${isThisProjectDirectory ? 'locked' : ''}" id="project-noninteractive-${project.projectId}">
+ 
+                    <div class="tooltip-container">
+                        <label class="switch">
+                            <input type="checkbox" style="cursor: grab;" class="startupToggleOfproject" data-project="${project.projectId}" ${autoStart ? "checked" : ""}>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="tooltip" id="${'tooltipText-' + project.projectId}" >${autoStart ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
+                        <small class="toolTipHint">| (Turn on Auto-Start for this project when you open its workspace.)</small>
+                    </div>
+
+                  </div>
+
+
+
                 </div>
 
-                <small style="display: block; margin-top: 8px; color: #555;">
-                📁 <strong>Workspace Binding:</strong>
-                <button
-                    class="bind-workspace-btn"
-                    data-project="${project.projectId}"
-                    style="background: none; border: none; color: #007acc; cursor: pointer; padding: 0;">
-                    Mark this current workspace for this project
-                </button>
-                </small>
-
-
-            </div>
         </div>`
         }).join('')
         : "<p id='noActionPresent'>Looks empty! Click 'Add' to create one.</p>";
@@ -115,247 +127,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Checkboxes with Actions</title>
-        <style>
-            body {
-                    font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
-                    line-height: 1.5;
-                    background-color: #f4f4f4;
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    height: 100vh;
-                    overflow: hidden; /* Prevents entire page from scrolling */
-                    padding: 10px;
-                    scrollbar-color: #6d7c77 #cfd7c7;
-            }
-
-            .mark-workspace{
-                font-size: 10px;
-                padding: 2px 6px;
-                background: #dfc215;
-                color: #555151;
-                border-radius: 4px;
-                position: relative;
-                top: -7px;
-                cursor: default;
-            }
-
-            .not-mark-workspace{
-             padding: 2px 6px;
-             opacity: 0;
-            }
-            
-            #toggle-details-btn-id{
-                position: relative;
-                left: -13px;
-                font-size: 11px;
-                color: #87457d;
-                    top: 5px;
-            }
-
-
-            #autorunsuggession{
-                position: relative;
-                color: darkblue;
-                top: 2px;
-            }
-            
-            #actionsContainer {
-                flex: 1;
-                width: 100%;
-                overflow-y: auto;
-                margin-top: 98px; /* Adjust based on heading height */
-                padding-bottom: 80px; /* Ensures space above button-container */
-            }
-
-            #noActionPresent {
-
-                font-weight: bold;
-                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
-                font-size: 15px; /* Adjust size as needed */
-                line-height: 1.5; /* Improve readability */
-                text-align: center;
-                color:rgb(153, 38, 55);
-                background: #f6f6f5;
-                padding: 10px;
-                border-radius: 6px;
-                border: 2px solid #ccc;
-                margin: 10px 0;
-            }
-            .project {
-                margin-bottom: 20px;
-                padding: 15px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                background: #f9f9f9;
-            }
-            .project-header {
-                font-size: 1.1em;
-                font-weight: bold;
-                margin-bottom: 10px;
-            }
-            .commands {
-                margin-left: 20px;
-            }
-            #projectHeader {
-                font-weight: bold; 
-                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
-                font-size: 15px; /* Adjust size as needed */
-                line-height: 1.5; /* Improve readability */
-                font-style: italic;
-                color: #4a90e2;
-                padding-bottom: 5px;
-            }
-
-            .command-item {
-                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
-                font-size: 14px; /* Adjust size as needed */
-                line-height: 1.5; /* Improve readability */
-                font-weight: 500;
-            }
-
-
-            #nameOfProject {
-                    position: fixed;
-                    top: -26px;
-                    width: 100%;
-                    background: white;
-                    text-align: center;
-                    padding: 10px 0;
-                    font-size: 44px;
-                    font-weight: 600;
-                    color: #4a90e2;
-                    border-bottom: 2px solid black;
-                    z-index: 10;
-            }
-
-            @media (max-width: 600px) {
-                #nameOfProject {
-                    font-size: 24px;
-                    margin: 20px 0;
-                }
-            }
-            label {
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-                color: #555;
-            }
-            input[type="checkbox"] {
-                margin-right: 10px;
-                transform: scale(1.2);
-            }
-            .button-container {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background: #fff;
-                box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-                padding: 10px;
-                display: flex;
-                justify-content: center;
-                z-index: 10;
-            }
-            button {
-                padding: 5px 10px;
-                border: none;
-                border-radius: 5px;
-                color: white;
-                cursor: pointer;
-                font-size: 14px;
-                margin: 0 5px;
-                transition: background-color 0.3s, transform 0.2s;
-            }
-
-            .switch {
-                position: relative;
-                display: inline-block;
-                width: 30px;
-                height: 22px;
-            }
-
-            .switch input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-
-            .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #ccc;
-                transition: .2s;
-                border-radius: 24px;
-            }
-
-            .slider:before {
-                position: absolute;
-                content: "";
-                height: 16px;
-                width: 16px;
-                left: 3px;
-                bottom: 3px;
-                background-color: white;
-                transition: .2s;
-                border-radius: 50%;
-            }
-
-            input:checked + .slider {
-                background-color: #b8383d;
-            }
-
-            input:checked + .slider:before {
-                transform: translateX(8px);
-            }
-
-
-            .tooltip-container {
-                border: #fafaf8;
-                padding-left: 7px;
-                border-width: medium;
-                border-style: solid;
-                position: relative;
-                left: -13px;
-                top: 7px; 
-            }
-
-            .tooltip {
-                position: relative;
-                top: 3px;
-                font-weight: 600;
-                color: black;
-                margin-right: 10px;
-            }
-
-
-            #exportData {
-            position: absolute; /* Position it off-screen */
-            left: -9999px; /* Move it off the visible area */
-            width: 1px; /* Minimal width */
-            height: 1px; /* Minimal height */
-            opacity: 0; /* Fully transparent */
-            }
-
-            #runButton { background-color: #28a745; }
-            #runButton:hover { background-color: #218838; transform: translateY(-1px); }
-            #restartButton { background-color: #dc3545; }
-            #restartButton:hover { background-color: #c82333; transform: translateY(-1px); }
-            #stopButton { background-color: #dc3545; }
-            #stopButton:hover { background-color: #c82333; transform: translateY(-1px); }
-            #deleteButton { background-color: #dc3545; }
-            #deleteButton:hover { background-color: #c82333; transform: translateY(-1px); }
-            #exportButton { background-color: #009688; }
-            #exportButton:hover { background-color: #00796b; transform: translateY(-1px); }
-            #createNewAction { background-color: #007bff; }
-            #createNewAction:hover { background-color: #0069d9; transform: translateY(-1px); }
-        </style>
+     ${innerCss}
     </head>
     <body>
         <h1 id="nameOfProject">${fancyProjectName}</h1>
@@ -377,22 +149,6 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
             const vscode = acquireVsCodeApi();
             const stateOfCheckBOx=${UICreator.checkBoxData.join("")};
 
-            // const toggle = document.getElementById("startupToggle");
-            // const tooltipText = document.getElementById("tooltipText");
-
-            // toggle.addEventListener("change", function() {
-            
-            //     vscode.postMessage({
-            //             callMethod: 'allowStartup',
-            //             data: this.checked
-            //         });
-
-            //         if(this.checked){
-            //          tooltipText.textContent ="Auto-Start: Enabled!";
-            //         }else{
-            //          tooltipText.textContent ="Auto-Start: Disabled";
-            //         }
-            // });
             
             
             document.getElementById('runButton').addEventListener('click', function() {
@@ -460,8 +216,8 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                      }
                      
                 }else if(target.classList.contains("startupToggleOfproject")){
-                 const projectID = target.dataset.project;
-                 console.log(projectID ,target.checked);
+                  const projectID = target.dataset.project;
+                  console.log(projectID ,target.checked);
 
 
                              
@@ -480,6 +236,10 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState, eachProject
                     }else{
                      tooltipText.textContent ="Auto-Start: Disabled";
                     }
+                }else if(target.classList.contains("tooglerSetDirectory")){
+                   const projectID = target.dataset.project;
+                   console.log(projectID ,target.checked);
+                
                 }
 
                     
