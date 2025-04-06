@@ -100,7 +100,7 @@ function loadOrRenderCacheUI(cacheKey, uiFunction, panel) {
       }
     }
   }
-  panel.webview.html = cache;
+  panel && (panel.webview.html = cache);
 }
 
 function setCachedUI(cacheKey, cachedUI) {
@@ -308,7 +308,8 @@ function activate(context) {
 
   context.subscriptions.push(Screen);
   context.subscriptions.push(statusBarIcon);
-
+  //setting initial UI home page
+  loadOrRenderCacheUI("home", () => HomePageUI(common), undefined);
   starupLogic(common);
 
 

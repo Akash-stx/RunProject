@@ -1,6 +1,6 @@
 
 function createNewCommand(response, common) {
-    const { name, command, projectName } = response?.data || {};
+    const { name, command, projectName, isWorkspaceToggle } = response?.data || {};
     const eachProjectLocator = common.eachProjectLocator();//load all project name and its saved index on commandStore
     const mainCommandObject = common.commandStore();
 
@@ -33,6 +33,7 @@ function createNewCommand(response, common) {
         mainCommandObject[projectId] = {
             projectId: projectId,
             projectName: projectName,
+            directory: isWorkspaceToggle ? common?.projectDirectory : "",
             datas: {
                 [commandID]: { id: commandID, projectId, commandDescription: name, actualCommand: command }
             },
@@ -81,6 +82,7 @@ function createBulkCommand(response, common) {
                     mainCommandObject[currentProjectFromArray.projectId] = {
                         projectId: currentProjectFromArray.projectId,
                         projectName: projectName,
+                        directory: "",
                         datas: mainProjectCommandDataRefrence,
                     };
 
@@ -104,6 +106,7 @@ function createBulkCommand(response, common) {
                 mainCommandObject[projectId] = {
                     projectId: projectId,
                     projectName: projectName,
+                    directory: "",
                     datas: mainProjectCommandDataRefrence,
                 };
 

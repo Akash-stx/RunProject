@@ -109,6 +109,23 @@ function addNewCommandUIpage({ eachProjectLocator } = {}) {
             <label for="command">Command</label>
             <input type="text" id="command" placeholder="e.g. npm install ; npm run dev" required>
             
+           <div style="margin: 10px 0; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="isWorkspaceToggle" />
+                <label for="isWorkspaceToggle" style="margin: 0; font-size: 14px;">
+                Set this folder as the active workspace for the entered project name
+                </label>
+            </div>
+
+            <p id="workspaceNote" style="margin: 4px 0 8px 22px; font-size: 12px; color: #666;">
+                <i>Commands require a workspace folder to run properly.</i>
+            </p>
+
+            <p id="projectError" style="color: red; font-size: 13px; display: none; margin: 0 0 10px 22px;">
+                Please enter a project name before setting a workspace.
+            </p>
+            </div>
+
             <label for="bulkData" id="bulkDataLabel">Bulk JSON Input:</label>
             <textarea id="bulkData"  placeholder='Enter JSON format: \n[{"name": "name1", "command": "command1"}, \n{"name": "name2", "command": "command2"}]\n No duplicate Name'>
             {
@@ -139,6 +156,8 @@ function addNewCommandUIpage({ eachProjectLocator } = {}) {
             const bulkDataLabel= document.getElementById('bulkDataLabel');
             const input = document.getElementById("searchBox");
             const suggestionBox = document.getElementById("suggestionsBox");
+            const isWorkspaceToggle = document.getElementById("isWorkspaceToggle");
+            
 
             // Toggle between single and bulk entry modes
             bulkToggle.addEventListener('change', () => {
@@ -236,7 +255,7 @@ function addNewCommandUIpage({ eachProjectLocator } = {}) {
                     if (command && name && projectName) {
                         vscode.postMessage({
                             callMethod: 'createCommand',
-                            data: { name, command , projectName}
+                            data: { name, command , projectName,isWorkspaceToggle:isWorkspaceToggle?.checked}
                         });
                     } else {
                         vscode.postMessage({

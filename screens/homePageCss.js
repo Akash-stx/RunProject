@@ -30,12 +30,6 @@ const css = `<style>
                 opacity: 0.6;
             }
 
-            // .project.locked .interactive {
-            //     pointer-events: auto;
-            //     opacity: 1;
-            // }
-
-
         
 
             .project-header {
@@ -240,10 +234,10 @@ const css = `<style>
                 color: black;
                 margin-right: 10px;
             }
-            #toolTipHint{
-            position: relative;
-            top: 2px;
-            color: #7501a7;
+            .toolTipHint  {
+                position: relative;
+                color: darkblue;
+                top: 2px;
             }
 
 

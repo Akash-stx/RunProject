@@ -20,11 +20,15 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
     };
 
     UICreator.checkBoxData.push("{");
+    const projectDirectoryFirst = [];
+    const OtherDirectorylast = [];
 
-    const checkboxesHtml = projectLocater?.length
-        ? projectLocater.map((locaterData) => {
+    projectLocater?.length
+        ? projectLocater.forEach((locaterData) => {
             const project = actions[locaterData.projectId];
-            const checkbox = Object.values(project?.datas || {});
+            //const checkbox = Object.values(project?.datas || {});
+            const checkbox = locaterData?.children || [];
+
             if (!project && !checkbox.length) {
                 return "";
             }
@@ -43,7 +47,9 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
             let howmanychecked = 0;
             let collectSelectedCheckBoxId = [];
 
-            const innerCheckBox = checkbox.map((command) => {
+
+            const innerCheckBox = checkbox.map((CommandIdByLocater) => {
+                const command = project?.datas?.[CommandIdByLocater];
                 const isChecked = state?.checkedCheckBoxId?.[command.id]; //map 
                 if (isChecked) {
                     collectSelectedCheckBoxId.push(`${command.id}:true`);
@@ -60,7 +66,8 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
 
             UICreator.checkBoxData.push(`{project:${project.projectId} , autoStart: ${autoStart} , total:${checkboxSize}, current:${howmanychecked} , checkedCheckBoxId:{${collectSelectedCheckBoxId.join()}} },`);
 
-            return `<div class="project">
+
+            const UI = `<div class="project">
            
                <div class="project-header  ${isThisProjectDirectory ? '' : 'locked'}" id="ph-${project.projectId}">
                 
@@ -96,7 +103,8 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
                             <input type="checkbox" style="cursor: grab;" class="tooglerSetDirectory" data-project="${project.projectId}" ${isThisProjectDirectory ? "checked" : ""}>
                             <span class="slider"></span>
                         </label>
-                        <small class="toolTipHint">| (Turn on Auto-Start for this project when you open its workspace.)</small>
+                        <span class="tooltip" >Set as Project Workspace</span>
+                        <small class="toolTipHint">| (Mark this directory as the workspace source for this project.)</small>
                     </div>
                     
 
@@ -117,11 +125,19 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
 
                 </div>
 
-        </div>`
-        }).join('')
+              </div>`;
+
+            if (isThisProjectDirectory) {
+                projectDirectoryFirst.push(UI);
+            } else {
+                OtherDirectorylast.push(UI);
+            }
+            //end of function
+        })
         : "<p id='noActionPresent'>Looks empty! Click 'Add' to create one.</p>";
 
-
+    projectDirectoryFirst.join("");
+    OtherDirectorylast.join("");
     UICreator.checkBoxData.push("}");
     return `<!DOCTYPE html>
     <html lang="en">
@@ -135,8 +151,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
         <h1 id="nameOfProject">${fancyProjectName}</h1>
 
         <textarea id="exportData">${toExport}</textarea>
-         
-        <div id="actionsContainer">${checkboxesHtml}</div>
+        <div id="actionsContainer">${projectDirectoryFirst}${OtherDirectorylast}</div>
 
         <div class="button-container">
             <button id="runButton">Run Selected</button>
