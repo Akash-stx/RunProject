@@ -253,7 +253,7 @@ function activate(context) {
             case 'deleteActions':
               deleteActions(response, common, () => {
 
-                fullBackup();
+                fullBackup({ all: true });
                 setCachedUI("home", HomePageUI(common));
                 loadOrRenderCacheUI("home", () => HomePageUI(common), panel);
               });
@@ -304,7 +304,6 @@ function activate(context) {
               setCachedUI("home", HomePageUI(common));
               vscode.window.showInformationMessage("Status Changed");
             }
-
               break;
 
           }

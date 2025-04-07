@@ -4,12 +4,23 @@ All notable changes to the "LaunchBoard" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased] - [0.0.3]
+## [Unreleased] - [0.0.4]
+
+
+
+## [0.0.3] - 2025-04-07
+
+### Changed
+- Projects can now only be started within their own workspace.
+- Editing or deleting all data of a project is now restricted to its associated workspace.
+- Workspace for a project can be changed via the project settings section (collapsible under each project).
+
 
 ## [0.0.2] - 2025-04-04
 
 ### Added
 - Improved UI with input placeholders, and more intuitive labels.
+
 
 ## [0.0.1] - 2025-04-03
 

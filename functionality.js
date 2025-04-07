@@ -183,7 +183,7 @@ function startTerminal(response, common) {
     eachProjectLocator?.forEach?.((projectObject) => {
         const { projectWorkspace } = startupDatas?.[projectObject.projectId] || {};
         let checkBoxStateMap;
-        if (projectWorkspace && common.projectDirectory === projectWorkspace && (checkBoxStateMap = checkBoxState[projectObject.projectId])) {
+        if (common.projectDirectory === projectWorkspace && (checkBoxStateMap = checkBoxState[projectObject.projectId])) {
             const { checkedCheckBoxId, current, total } = checkBoxStateMap || {};
             OldBoxState[projectObject.projectId] = checkBoxStateMap;
             if (total && current > 0) {
@@ -268,13 +268,17 @@ function reStartTerminal(response, common) {
     const { data: selectedCheckbox } = response;
     const eachProjectLocator = common.eachProjectLocator();
     const commandStore = common.commandStore();
-
+    const startupDatas = common.getStartup();
     const TERMINAL_IdMap = common.TERMINAL_IdMap();
     const activeTerminals = common.activeTerminals();
 
     let isRestartHappened = false;
 
     eachProjectLocator?.forEach?.((projectObject) => {
+        const { projectWorkspace } = startupDatas?.[projectObject.projectId] || {};
+        if (common.projectDirectory !== projectWorkspace) {
+            return;
+        }
         const { checkedCheckBoxId, current, total } = selectedCheckbox[projectObject.projectId] || {};
 
         if (total && current > 0) {
@@ -325,6 +329,7 @@ function stopTerminal(response, common) {
 function deleteActions(response, common, callBack) {
     const eachProjectLocator = common.eachProjectLocator();
     const commandStore = common.commandStore();
+    const startupDatas = common.getStartup();
     // const activeTerminals = common.activeTerminals();
     let isDeleteHappened = false;
     const { data: stateOfCheckBOx } = response;
@@ -339,9 +344,15 @@ function deleteActions(response, common, callBack) {
             const newProjectLocaterObject = [];
 
             eachProjectLocator?.forEach?.((projectObject) => {
+
+                const { projectWorkspace } = startupDatas?.[projectObject.projectId] || {};
+                if (common.projectDirectory !== projectWorkspace) {
+                    newProjectLocaterObject.push(projectObject);
+                    return;
+                }
                 const { checkedCheckBoxId, current, total } = stateOfCheckBOx[projectObject.projectId];
 
-                if (total && total === current) {
+                if (total === current) {
                     //this show all checkbox is selected 
                     delete commandStore[projectObject.projectId];
                     !isDeleteHappened && (isDeleteHappened = true);

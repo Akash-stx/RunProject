@@ -3,7 +3,7 @@ const innerCss = require("./homePageCss");
 function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
     eachProjectLocator, getStartup, projectDirectory } = {}) {
 
-    const emptyList_Message = "<p id='noActionPresent'>Looks empty! Click 'Add' to create one.</p>";
+    const emptyList_Message = "<p id='noActionPresent'>No projects found. Click 'Add' to create a new one.</p>";
 
 
     //load all data like project name and its comment like that
