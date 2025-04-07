@@ -1,5 +1,5 @@
 const addNewCommandUIpage = require("./screens/addNewCommandUIpage");
-const { createNewCommand, createNewTerminal, starupLogic, startTerminal, deleteActions, createBulkCommand, reStartTerminal, stopTerminal } = require("./functionality");
+const { createNewCommand, saveCheckBoxStateByWorkspace, starupLogic, startTerminal, deleteActions, createBulkCommand, reStartTerminal, stopTerminal } = require("./functionality");
 const HomePageUI = require("./screens/HomePageUI");
 const reStartView = require("./screens/Resolve");
 const vscode = require("vscode");
@@ -264,24 +264,47 @@ function activate(context) {
             case 'allowStartup':
               const {
                 projectID,
-                selected } = response.data || {};
+                selected, stateOfCheckBOx } = response.data || {};
 
 
               const getStartup = common.getStartup();
               const statePresent = getStartup[projectID];
               if (statePresent) {
                 statePresent.autoStart = selected;
-                statePresent.autoStartWorkspace = selected ? projectDirectory : false
+                //statePresent.projectWorkspace = selected ? projectDirectory : ""
               } else {
                 getStartup[projectID] = {
                   autoStart: selected,
-                  autoStartWorkspace: selected ? projectDirectory : false
+                  // projectWorkspace: selected ? projectDirectory : false
+                }
+              }
+              saveCheckBoxStateByWorkspace(stateOfCheckBOx, common);
+              fullBackup({ KEY_STARTUP, KEY_STATE });
+              setCachedUI("home", HomePageUI(common));
+              vscode.window.showInformationMessage("Status Changed");
+              break;
+            case 'setDirectory': {
+              const {
+                projectID,
+                selected } = response.data || {};
+
+              const getStartup = common.getStartup();
+              const statePresent = getStartup[projectID];
+              if (statePresent) {
+                //statePresent.autoStart = selected;
+                statePresent.projectWorkspace = selected ? projectDirectory : false
+              } else {
+                getStartup[projectID] = {
+                  //autoStart: selected,
+                  projectWorkspace: selected ? projectDirectory : false
                 }
               }
 
               fullBackup({ KEY_STARTUP });
               setCachedUI("home", HomePageUI(common));
               vscode.window.showInformationMessage("Status Changed");
+            }
+
               break;
 
           }
@@ -308,7 +331,9 @@ function activate(context) {
 
   context.subscriptions.push(Screen);
   context.subscriptions.push(statusBarIcon);
-  //setting initial UI home page
+  // setting initial UI home page -> loading before screen is loaded so ui can be fast 
+  // currenty due to the vs code internal implementaion the UI is by defaule 1second delay even how fast 
+  // our own application extension was
   loadOrRenderCacheUI("home", () => HomePageUI(common), undefined);
   starupLogic(common);
 

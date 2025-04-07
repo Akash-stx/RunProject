@@ -3,7 +3,7 @@ function createNewCommand(response, common) {
     const { name, command, projectName, isWorkspaceToggle } = response?.data || {};
     const eachProjectLocator = common.eachProjectLocator();//load all project name and its saved index on commandStore
     const mainCommandObject = common.commandStore();
-
+    const startupDatas = common.getStartup();
     const currentProjectFromArray = eachProjectLocator.find((project) => project.projectName === projectName);
 
     if (currentProjectFromArray) { // already this project is present 
@@ -29,11 +29,11 @@ function createNewCommand(response, common) {
             children: [commandID]
         });
 
+        startupDatas[projectId] = { autoStart: false, projectWorkspace: isWorkspaceToggle ? common?.projectDirectory : "" };
 
         mainCommandObject[projectId] = {
             projectId: projectId,
             projectName: projectName,
-            directory: isWorkspaceToggle ? common?.projectDirectory : "",
             datas: {
                 [commandID]: { id: commandID, projectId, commandDescription: name, actualCommand: command }
             },
@@ -51,6 +51,7 @@ function createBulkCommand(response, common) {
     const { data: BulkarrayOfJsonData } = response || {};
     const eachProjectLocator = common.eachProjectLocator();//load all project name and its saved index on commandStore
     const mainCommandObject = common.commandStore();
+    const startupDatas = common.getStartup();
     let anyProjectAdded = false;
 
     Object.values(BulkarrayOfJsonData || {})?.forEach?.(({ projectName, datas } = {}) => {
@@ -82,7 +83,6 @@ function createBulkCommand(response, common) {
                     mainCommandObject[currentProjectFromArray.projectId] = {
                         projectId: currentProjectFromArray.projectId,
                         projectName: projectName,
-                        directory: "",
                         datas: mainProjectCommandDataRefrence,
                     };
 
@@ -100,13 +100,14 @@ function createBulkCommand(response, common) {
                     children: projectLocaterCommandRefrence
                 }
                 eachProjectLocator.push(projectLocaterRefrence);
+                startupDatas[projectId] = { autoStart: false, projectWorkspace: "" };
+
 
                 mainProjectCommandDataRefrence = {};
 
                 mainCommandObject[projectId] = {
                     projectId: projectId,
                     projectName: projectName,
-                    directory: "",
                     datas: mainProjectCommandDataRefrence,
                 };
 
@@ -170,41 +171,64 @@ function createNewTerminal(data, common) {
 }
 
 function startTerminal(response, common) {
-    //const { vscode, activeTerminals, TERMINAL_IdMap } = common;
-    const commandStore = common.commandStore();
-    const eachProjectIndex = common.eachProjectLocator();
 
     const commandThatCannotAbleToStart = [];
-    const { data: stateOfCheckBOx } = response;
-    //actions here means these are terminal name wich is checked  on ui and need to start it ,
-    //so based on that we seting true or false on our commandStore object
+    const eachProjectLocator = common.eachProjectLocator();
+    const commandStore = common.commandStore();
+    const startupDatas = common.getStartup();
+    const { data: checkBoxState } = response;
+    const OldBoxState = common.checkBoxState();
 
-    Object.values(stateOfCheckBOx || {}).forEach(
-        ({ checkedCheckBoxId, project: projectId, current: currentSelected } = {}) => {
-            if (currentSelected < 1 || !currentSelected) {
-                return;
-            }
-            const projectObject = commandStore[projectId];
-            Object.entries(checkedCheckBoxId || {})?.forEach(([keys, value]) => {
-                if (value) {
-                    const data = projectObject?.datas?.[keys];
-                    if (data) {
-                        const newObject = { ...data, projectId, projectName: projectObject?.projectName };
-                        const result = createNewTerminal(newObject, common);
+
+    eachProjectLocator?.forEach?.((projectObject) => {
+        const { projectWorkspace } = startupDatas?.[projectObject.projectId] || {};
+        let checkBoxStateMap;
+        if (projectWorkspace && common.projectDirectory === projectWorkspace && (checkBoxStateMap = checkBoxState[projectObject.projectId])) {
+            const { checkedCheckBoxId, current, total } = checkBoxStateMap || {};
+            OldBoxState[projectObject.projectId] = checkBoxStateMap;
+            if (total && current > 0) {
+                const { datas, projectName } = commandStore[projectObject.projectId];
+                if (!datas) return; // safe return on any issue
+
+                let allowedLoopAfter = current;
+                const totallen = projectObject?.children?.length || 0;
+
+                for (let index = 0; index < totallen; index++) {
+                    const id = projectObject.children[index]; // array of chilren id 
+                    if (checkedCheckBoxId[id]) { // checking that id in this map gives true if present
+                        const passingData = { ...datas[id], projectName };
+                        const result = createNewTerminal(passingData, common);
                         if (result) {
-                            commandThatCannotAbleToStart.push(newObject);
+                            commandThatCannotAbleToStart.push(passingData);
+                        }
+                        allowedLoopAfter--;
+                        if (allowedLoopAfter === 0) {
+                            break;
                         }
                     }
-
                 }
-
-            });
-
+            }
         }
 
-    );
-    common.setCheckBoxState(stateOfCheckBOx);
+    });
+    common.setCheckBoxState(OldBoxState);
     return commandThatCannotAbleToStart;
+
+}
+
+function saveCheckBoxStateByWorkspace(checkBoxState, common) {
+    const eachProjectLocator = common.eachProjectLocator();
+    const startupDatas = common.getStartup();
+    const OldBoxState = common.checkBoxState();
+
+    eachProjectLocator?.forEach?.((projectObject) => {
+        const { projectWorkspace } = startupDatas?.[projectObject.projectId] || {};
+        let checkBoxStateMap;
+        if (projectWorkspace && common.projectDirectory === projectWorkspace && (checkBoxStateMap = checkBoxState[projectObject.projectId])) {
+            OldBoxState[projectObject.projectId] = checkBoxStateMap;
+        }
+    });
+    common.setCheckBoxState(OldBoxState);
 }
 
 function starupLogic(common) {
@@ -215,9 +239,9 @@ function starupLogic(common) {
 
 
     eachProjectLocator?.forEach?.((projectObject) => {
-        const { autoStart, autoStartWorkspace } = startupDatas?.[projectObject.projectId] || {};
+        const { autoStart, projectWorkspace } = startupDatas?.[projectObject.projectId] || {};
         let checkBoxStateMap;
-        if (autoStart && common.projectDirectory === autoStartWorkspace && (checkBoxStateMap = checkBoxState[projectObject.projectId])) {
+        if (autoStart && common.projectDirectory === projectWorkspace && (checkBoxStateMap = checkBoxState[projectObject.projectId])) {
             const { checkedCheckBoxId, current, total } = checkBoxStateMap;
             if (total && current > 0) {
                 const { datas } = commandStore[projectObject.projectId];
@@ -356,6 +380,6 @@ function deleteActions(response, common, callBack) {
 module.exports = {
     createNewCommand,
     startTerminal,
-    deleteActions, createBulkCommand,
+    deleteActions, createBulkCommand, saveCheckBoxStateByWorkspace,
     reStartTerminal, stopTerminal, createNewTerminal, starupLogic
 }
