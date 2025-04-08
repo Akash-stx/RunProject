@@ -1,46 +1,52 @@
-# LaunchBoard 🚀  
+# 🚀 LaunchBoard
 
-A **VS Code extension** to run project-specific commands fast with a clean UI.
+**LaunchBoard** is a VS Code extension that lets you run project-specific commands from a clean and simple interface – no terminal required.
 
-## Features  
-- ✅ **Run Commands** - Execute project commands without opening a terminal.  
-- 🔄 **Auto-Start Projects** - Launch projects automatically in their workspace.  
-- 📌 **Manage Multiple Projects** - Enable/disable auto-start per project.  
-- 📤 **JSON Export/Import** - Share & import project settings easily.  
-- ⚡ **One-Click Execution** - Start, stop, or restart commands instantly.  
+## ✨ Features
 
-## Installation  
-1. Open **VS Code**.  
-2. Go to **Extensions** (`Ctrl + Shift + X`).  
-3. Search for **LaunchBoard** and click **Install**.
+- ✅ Run commands without opening a terminal  
+- 🔄 Automatically launch projects when a workspace is opened  
+- 📁 Manage multiple project setups  
+- 📤 Export and import settings via JSON  
+- ⚡ One-click start, stop, and restart  
 
-## How to Use  
-### 1️⃣ Add Projects  
-- Click **"Add"** to register a project.  
-- Assign commands to run in that project.  
+## 📦 Installation
 
-### 2️⃣ Auto-Start Projects  
-- Toggle **Auto-Start** to launch projects automatically.  
-- Saves the current directory for accurate execution.  
+1. Open Visual Studio Code  
+2. Go to Extensions (`Ctrl+Shift+X`)  
+3. Search for "LaunchBoard" and click Install  
 
-### 3️⃣ Run & Manage Commands  
-- **Run** - Start selected commands.  
-- **Restart** - Restart selected commands.  
-- **Stop** - Stop running commands.  
-- **Delete** - Remove projects from the list.  
+## 🚀 Usage
 
-### 4️⃣ Export & Import Configurations  
-- Use **"Copy as JSON"** to export settings.  
-- Share JSON files to import configurations easily.  
+### Add Projects
 
-## Screenshot  
-![LaunchBoard UI](assets/screenshot.png)  
+- Click "Add" to register a project  
+- Assign commands to be run for each project  
 
-## Why JSON Export?  
-Easily share and import project configurations across teams. **Export settings**, share with others, and **import instantly** for consistency.
+### Automatic Project Launch
 
-## Open LaunchBoard  
-Click the **LaunchBoard icon** in the sidebar to open the extension.
+- Enable "Automatic Project Launch" via "project setting"  to auto-run commands when the workspace opens  
+- Ideal for starting dev servers, watchers, etc.
 
-## License  
-MIT License
+### Manage Commands
+
+- ▶️ Run  
+- 🔁 Restart  
+- ⏹️ Stop  
+- ❌ Delete  
+
+### Export/Import
+
+- 📤 Copy as JSON to export  
+- 📥 Paste JSON to import settings  
+
+## 🖼️ Quick Preview
+
+![LaunchBoard Demo](assets/demo.gif)
+
+## 🪪 License
+
+All Rights Reserved.  
+You may view the source code of this project, but you may not reproduce, distribute, modify, or use any part of it without explicit permission from the author.
+
+© 2025 dev.akash

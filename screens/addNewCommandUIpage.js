@@ -1,149 +1,206 @@
 function addNewCommandUIpage({ eachProjectLocator } = {}) {
-    const projects = eachProjectLocator().map((data) => data?.searchBox)?.join();
-    return `
+  const projects = eachProjectLocator().map((data) => data?.searchBox)?.join();
+  return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>New Action Form</title>
-        <style>
+       <style>
+    body {
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 15px;
+      background-color: #f5f7fa;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: start;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
 
-         
-            body {
-                font-weight: bold;
-                font-family: 'Consolas', 'Roboto Mono', 'Ubuntu Mono', 'Courier New', monospace;
-                font-size: 15px; /* Adjust size as needed */
-                line-height: 1.5; /* Improve readability */
-                padding: 20px;
-                background-color: #f0f0f0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-            }
-            .container {
-                background: white;
-                padding: 30px;
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                width: 100%;
-                max-width: 400px;
-            }
-            h1 {
-                text-align: center;
-                color: #333;
-                margin-bottom: 20px;
-            }
-            label {
-                display: block;
-                margin: 10px 0 5px;
-                color: #555;
-            }
-            input[type="text"], textarea {
-                width: 100%;
-                padding: 10px;
-                margin-bottom: 15px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                transition: border 0.3s;
-            }
-            input[type="text"]:focus, textarea:focus {
-                border-color: #007acc;
-                outline: none;
-            }
-            button {
-                width: 48%;
-                padding: 10px;
-                border: none;
-                border-radius: 4px;
-                color: white;
-                cursor: pointer;
-                margin-top: 10px;
-                font-size: 16px;
-                transition: background-color 0.3s;
-            }
-            #submit {
-                background-color: #28a745; /* Green */
-            }
-            #submit:hover {
-                background-color: #218838; /* Darker green */
-            }
-            #viewActionList {
-                background-color: #007bff; /* Blue */
-            }
-            #viewActionList:hover {
-                background-color: #0069d9; /* Darker blue */
-            }
-            #bulkData {
-                display: none;
-                height: 100px;
-            }
-            #bulkDataLabel {
-                display: none;
-            }
+    .container {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      max-width: 600px;
+      width: 100%;
+      padding: 30px 28px;
+      box-sizing: border-box;
+    }
 
-             #headerr {
-                font-family: 'Arial', sans-serif;
-                font-size: 24px;
-                font-weight: bold;
-                text-align: center;
-                color: #4a90e2; /* Solid blue color */
-                margin: 20px 0;
-                padding-bottom: 5px;
-                border-bottom: 2px solid #4a90e2; /* Underline effect */
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1 id="headerr">Add New Command</h1>
-            <label><input type="checkbox" id="bulkToggle"> Enable Bulk Entry</label>
-            <label for="searchBox">Project Name</label>
-            <input type="text" id="searchBox" placeholder="e.g. MyApp, PortfolioSite, API-Server" required>
-            <ul id="suggestionsBox" ></ul>
-            <label for="name">Command Title</label>
-            <input type="text" id="name" placeholder="e.g. Start Dev Server" required>
-            
-            <label for="command">Command</label>
-            <input type="text" id="command" placeholder="e.g. npm install ; npm run dev" required>
-            
-           <div style="margin: 10px 0; display: flex; flex-direction: column;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="isWorkspaceToggle" />
-                <label for="isWorkspaceToggle" style="margin: 0; font-size: 14px;">
-                Set this folder as the active workspace for the entered project name
-                </label>
-            </div>
+    #headerr {
+      font-size: 22px;
+      font-weight: 600;
+      color: #4a90e2;
+      text-align: center;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #4a90e2;
+      padding-bottom: 8px;
+    }
 
-            <p id="workspaceNote" style="margin: 4px 0 8px 22px; font-size: 12px; color: #666;">
-                <i>Commands require a workspace folder to run properly.</i>
-            </p>
+    label {
+      font-weight: 500;
+      color: #333;
+      display: block;
+      margin: 16px 0 6px;
+    }
 
-            <p id="projectError" style="color: red; font-size: 13px; display: none; margin: 0 0 10px 22px;">
-                Please enter a project name before setting a workspace.
-            </p>
-            </div>
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: 0.2s ease-in-out;
+      box-sizing: border-box;
+    }
 
-            <label for="bulkData" id="bulkDataLabel">Bulk JSON Input:</label>
-            <textarea id="bulkData"  placeholder='Enter JSON format: \n[{"name": "name1", "command": "command1"}, \n{"name": "name2", "command": "command2"}]\n No duplicate Name'>
-            {
-                "id": {
-                    "datas": {
-                        "188": {
-                            "actualCommand": "example start",
-                            "commandDescription": "example"
-                        }
-                    },
-                    "projectName": "ve project"
-                }
-            }
-    </textarea>
-            
-            <button id="submit">Submit</button>
-            <button id="viewActionList">Go to Action List</button>
-        </div>
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: #007acc;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.15);
+    }
+
+    textarea {
+      font-family: monospace;
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    #suggestionsBox {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 30px;
+    }
+
+    #workspaceNote,
+    #projectError {
+      font-size: 12px;
+      margin-left: 26px;
+    }
+
+    #workspaceNote {
+      color: #666;
+    }
+
+    #projectError {
+      color: red;
+      display: none;
+    }
+
+    #bulkDataLabel,
+    #bulkData {
+      display: none;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    #submit {
+      background-color: #28a745;
+    }
+
+    #submit:hover {
+      background-color: #218838;
+    }
+
+    #viewActionList {
+      background-color: #007bff;
+    }
+
+    #viewActionList:hover {
+      background-color: #0069d9;
+    }
+
+    @media (max-width: 500px) {
+      .button-group {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="headerr">Add New Command</h1>
+
+    <label class="checkbox-group">
+      <input type="checkbox" id="bulkToggle" /> Enable Bulk Entry
+    </label>
+
+    <label for="searchBox">Project Name</label>
+    <input type="text" id="searchBox" placeholder="e.g. MyApp, PortfolioSite, API-Server" required />
+    <ul id="suggestionsBox"></ul>
+
+    <label for="name">Command Title</label>
+    <input type="text" id="name" placeholder="e.g. Start Dev Server" required />
+
+    <label for="command">Command</label>
+    <input type="text" id="command" placeholder="e.g. npm install ; npm run dev" required />
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="isWorkspaceToggle" />
+      <label for="isWorkspaceToggle" style="margin: 0;">
+        Set this folder as the active workspace for the entered project name
+      </label>
+    </div>
+
+    <p id="workspaceNote"><i>Each 'project name' require a workspace to run properly.</i></p>
+    <p id="projectError">Please enter a project name before setting a workspace.</p>
+
+    <label for="bulkData" id="bulkDataLabel">Bulk JSON Input:</label>
+    <textarea
+      id="bulkData"
+      placeholder='Enter JSON format:
+[{"name": "name1", "command": "command1"},
+{"name": "name2", "command": "command2"}]
+No duplicate Name'
+    >{
+  "id": {
+    "datas": {
+      "188": {
+        "actualCommand": "example start",
+        "commandDescription": "example"
+      }
+    },
+    "projectName": "ve project"
+  }
+}</textarea>
+
+    <div class="button-group">
+      <button id="submit">Submit</button>
+      <button id="viewActionList">Back</button>
+    </div>
+  </div>
         
         <script>
             const vscode = acquireVsCodeApi();

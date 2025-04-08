@@ -116,8 +116,8 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
                             <input type="checkbox" style="cursor: grab;" class="startupToggleOfproject" data-project="${project.projectId}" ${autoStart ? "checked" : ""}>
                             <span class="slider"></span>
                         </label>
-                        <span class="tooltip" id="${'tooltipText-' + project.projectId}" >${autoStart ? "Auto-Start: Enabled!" : "Auto-Start: Disabled"}</span>
-                        <small class="toolTipHint">| (Turn on Auto-Start for this project when you open its workspace.)</small>
+                        <span class="tooltip" id="${'tooltipText-' + project.projectId}" >${autoStart ? "Automatic Project Launch: Enabled!" : "Automatic Project Launch: Disabled"}</span>
+                        <small class="toolTipHint">| (Turn on Automatic Project Launch for this project when you open its workspace.)</small>
                     </div>
 
                   </div>
@@ -249,9 +249,9 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
                     const tooltipText = document.getElementById('tooltipText-'+projectID);
 
                     if(target.checked){
-                     tooltipText.textContent ="Auto-Start: Enabled!";
+                     tooltipText.textContent ="Automatic Project Launch: Enabled!";
                     }else{
-                     tooltipText.textContent ="Auto-Start: Disabled";
+                     tooltipText.textContent ="Automatic Project Launch: Disabled";
                     }
                 }else if(target.classList.contains("tooglerSetDirectory")){
                    const projectID = target.dataset.project;

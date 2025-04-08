@@ -85,7 +85,7 @@ const css = `<style>
                 font-size: 15px; /* Adjust size as needed */
                 line-height: 1.5; /* Improve readability */
                 text-align: center;
-                color:rgb(153, 38, 55);
+                color:#707070;
                 background: #f6f6f5;
                 padding: 10px;
                 border-radius: 6px;
@@ -125,7 +125,7 @@ const css = `<style>
                     background: white;
                     text-align: center;
                     padding: 10px 0;
-                    font-size: 44px;
+                    font-size: 35px;
                     font-weight: 600;
                     color: #4a90e2;
                     border-bottom: 2px solid black;

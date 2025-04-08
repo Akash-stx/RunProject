@@ -27,6 +27,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Initial Release
 - First version of **LaunchBoard** published.
 - Allows running project-specific commands via UI.
-- Supports auto-start functionality for projects.
+- Supports Automatic Project Launch — automatically runs predefined commands as soon as a project workspace is     opened, without any manual input.
 - Provides a clean and intuitive interface for managing workspace commands.
 
