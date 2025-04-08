@@ -4,21 +4,21 @@
   "publisher": "dev-akash",
   "description": "",
   "icon": "icon.png",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.94.0"
   },
+  "main": "dist/extension.js",
   "repository": {
-  "type": "git",
-  "url": "https://github.com/Akash-stx/RunProject.git"
-},
+    "type": "git",
+    "url": "https://github.com/Akash-stx/RunProject.git"
+  },
   "categories": [
     "Other"
   ],
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./extension.js",
   "contributes": {
     "commands": [
       {
@@ -47,6 +47,8 @@
     ]
   },
   "scripts": {
+    "build": "node build.js",
+    "package": "npm run build && vsce package",
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test"
@@ -57,8 +59,7 @@
     "@types/vscode": "^1.94.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.25.2",
     "eslint": "^9.13.0"
-  },
-  "dependencies": {
   }
 }
