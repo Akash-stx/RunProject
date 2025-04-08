@@ -17,6 +17,11 @@
 3. Search for "LaunchBoard" and click Install  
 
 ## 🚀 Usage
+![LaunchBoard Demo](assets/howToLaunch.png)
+Once the **LaunchBoard** extension is installed:
+
+- A **🚀 LaunchBoard icon** will appear in the **VS Code status bar** (bottom panel).
+- Click the icon to open the LaunchBoard panel and manage your projects.
 
 ### Add Projects
 
