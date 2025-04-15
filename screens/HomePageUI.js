@@ -355,7 +355,7 @@ function HomePageUI({ commandStore, fancyProjectName, checkBoxState,
                     data: null
                 });
             });
-
+            vscode.postMessage({ callMethod: 'webview-ready' });
         </script>
     </body>
     </html>`;

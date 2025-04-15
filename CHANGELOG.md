@@ -4,8 +4,12 @@ All notable changes to the "LaunchBoard" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased] - [0.0.7]
+## [Unreleased] - [0.0.8]
 
+## [0.0.7] - 2025-04-15
+
+### Changed
+- Added a loading spinner to the status bar when opening LaunchBoard, improving feedback during startup.
 
 ## [0.0.6] - 2025-04-08
 

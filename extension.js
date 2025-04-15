@@ -62,6 +62,23 @@ let projectDirectory;
 let reloadUI = 0;
 let UiReloadedBy = {};
 
+let statusBarIcon;
+function hideStatusBarLoading() {
+  if (statusBarIcon) {
+    statusBarIcon.command = 'LaunchBoard';
+    statusBarIcon.text = `$(zap) ${fancyProjectName}`;  // $(zap) is an icon from the Octicons set
+    statusBarIcon.tooltip = `Open ${fancyProjectName}`;
+  }
+}
+
+function showStatusBarLoading() {
+  if (statusBarIcon) {
+    statusBarIcon.command = 'LaunchBoard';
+    statusBarIcon.text = `$(sync~spin) ${fancyProjectName}...`;
+    statusBarIcon.tooltip = `Launching ${fancyProjectName}...`;
+  }
+}
+
 function allowUIReload(Times) {
   reloadUI = Times;
   UiReloadedBy = {};
@@ -181,12 +198,13 @@ function activate(context) {
       }
 
     } else {
+      showStatusBarLoading();
       panel = vscode.window.createWebviewPanel(
         'LaunchBoard',
         fancyProjectName,
         vscode.ViewColumn.One,
         {
-          enableScripts: true
+          enableScripts: true,
         }
       );
       panel.iconPath = getIcon(context);
@@ -214,7 +232,9 @@ function activate(context) {
               loadOrRenderCacheUI("addNewCommand", () => addNewCommandUIpage(common), panel);
               break;
 
-
+            case "webview-ready":
+              hideStatusBarLoading();
+              break;
             //===========> service next 
             case 'createCommand':
               const result = createNewCommand(response, common);
@@ -320,7 +340,7 @@ function activate(context) {
 
 
   // Create a status bar item with an icon
-  const statusBarIcon = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+  statusBarIcon = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
   statusBarIcon.command = 'LaunchBoard';
   statusBarIcon.text = `$(zap) ${fancyProjectName}`;  // $(zap) is an icon from the Octicons set
   statusBarIcon.tooltip = `Open ${fancyProjectName}`;
